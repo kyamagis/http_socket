@@ -28,6 +28,7 @@
 typedef struct s_data
 {
 	str_	response_message;
+	str_	request_message;
 }	t_data;
 
 class IOMultiplexing
