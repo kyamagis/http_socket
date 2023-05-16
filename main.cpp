@@ -24,5 +24,6 @@ int	main(int argc, char **argv)
 	std::cout << "サーバー起動!!" << std::endl;
 	
 	iom.IOMultiplexingLoop();
-
 }
+
+// https://github.com/kyamagis/http_socket.git
