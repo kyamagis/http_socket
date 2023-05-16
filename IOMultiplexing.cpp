@@ -157,9 +157,9 @@ void	IOMultiplexing::IOMultiplexingLoop()
 
 	while(true)
 	{
-		memcpy(&_writefds, &_master_writefds, sizeof(_master_writefds));
-		memcpy(&_readfds, &_master_readfds, sizeof(_master_readfds));
-		ready = select(_max_descripotor + 1, &_readfds, &_writefds, NULL, &this->_timeout);
+		memcpy(&this->_writefds, &this->_master_writefds, sizeof(this->_master_writefds));
+		memcpy(&this->_readfds, &this->_master_readfds, sizeof(_master_readfds));
+		ready = select(this->_max_descripotor + 1, &this->_readfds, &this->_writefds, NULL, &this->_timeout);
 		if (ready == 0)
 		{
 			continue ;
@@ -170,13 +170,13 @@ void	IOMultiplexing::IOMultiplexingLoop()
 		{
 			for (int fd = 0; fd < this->_max_descripotor + 1; fd++)
 			{
-				if (FD_ISSET(fd, &_writefds))
+				if (FD_ISSET(fd, &this->_writefds))
 				{
 					sendResponse(fd);
 					std::cout << "clnt_socket: " <<  fd << ", max_descripotor: " 
 								<< this->_max_descripotor << std::endl;
 				}
-				else if (FD_ISSET(fd, &_readfds))
+				else if (FD_ISSET(fd, &this->_readfds))
 				{
 					if (containsListeningSocket(fd))
 					{
