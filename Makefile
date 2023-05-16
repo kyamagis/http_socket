@@ -15,7 +15,7 @@ $(NAME): $(OBJS)
 # $(NAME): $(OBJS)
 # 		ar r $(NAME) $(OBJS)
 
-test: re
+test: all
 	./serv 8080 8081 8082
 
 clean:
