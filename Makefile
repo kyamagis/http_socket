@@ -3,6 +3,8 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -MMD -MP
 SRCS = ./main.cpp \
 		./IOMultiplexing.cpp \
 		./utils.cpp \
+		./ResponseMessage.cpp \
+		./MessageManagement.cpp \
 
 OBJS = $(SRCS:.cpp=.o)
 NAME = ./serv

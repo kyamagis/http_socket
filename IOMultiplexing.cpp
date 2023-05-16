@@ -1,8 +1,9 @@
 #include "./IOMultiplexing.hpp"
 
 #define BUFF_SIZE 10240
-#define RESPONSE_MESSAGE this->_fd_data[accepted_socket].response_message
-#define REQUEST_MESSAGE this->_fd_data[accepted_socket].request_message
+#define DEQ_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message
+#define RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message[0].response_message
+#define REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].request_message
 
 IOMultiplexing::IOMultiplexing()
 {
@@ -94,7 +95,7 @@ void	IOMultiplexing::sendResponse(int accepted_socket)
 				this->_max_descripotor -= 1;
 		}
 		utils::x_close(accepted_socket);
-		this->_fd_data.erase(accepted_socket);
+		this->_fd_MessageManagement.erase(accepted_socket);
 	}
 	else if ((size_t)sent_len < RESPONSE_MESSAGE.size())
 	{
@@ -126,7 +127,7 @@ void	IOMultiplexing::createAcceptedSocket(int listening_socket)
 			debug("accept() == -1");
 			return ;
 		}
-		this->_fd_data.insert(std::pair<int, t_data>(accepted_socket, t_data()));
+		this->_fd_MessageManagement.insert(std::pair<int, MessageManagement>(accepted_socket, MessageManagement()));
 		FD_SET(accepted_socket, &this->_master_readfds);
 		if (this->_max_descripotor < accepted_socket)
 			this->_max_descripotor = accepted_socket;
@@ -142,11 +143,14 @@ void	IOMultiplexing::storeRequestToMap(int accepted_socket)
 		return ;
 
 	REQUEST_MESSAGE += buffer;
+
+	//if (REQUEST_MESSAGE.find("\r\n\r\n") != str_::npos)
+	
 	if (buffer[BUFF_SIZE - 1] == '\0')
 	{
 		FD_CLR(accepted_socket, &this->_master_readfds);
 		FD_SET(accepted_socket, &this->_master_writefds);
-		RESPONSE_MESSAGE = utils::makeResponseMessage(REQUEST_MESSAGE);
+		DEQ_RESPONSE_MESSAGE.push_back(utils::makeResponseMessage(REQUEST_MESSAGE));
 		REQUEST_MESSAGE.clear();
 	}
 }

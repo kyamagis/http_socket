@@ -4,8 +4,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
-#include <map>
 #include <cerrno>
 
 #include <stdio.h>
@@ -17,11 +15,19 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
-#include <signal.h>
 
 #define str_ std::string
 #define LOCAL_HOST 2130706433 //127.0.0.1
 #define debug(str) std::cout << str << std::endl
+
+enum e_phase
+{
+	RECV_REQUEST,
+	RECV_ENTITY,
+	SEND_RESPONSE,
+	CGI_PHASE,
+	CLOSE_ACCEPTED_SOCKET
+};
 
 namespace utils
 {

@@ -19,17 +19,14 @@
 #include <signal.h>
 
 #include "./utils.hpp"
+#include "./MessageManagement.hpp"
 
 #define str_ std::string
 #define vec_int_ std::vector<int>
-#define map_fd_data_ std::map<int, t_data>
-#define map_ite_ std::map<int, t_data>::iterator
+#define map_fd_MessageManagement_ std::map<int, MessageManagement>
+#define map_ite_ std::map<int, MessageManagement>::iterator
 
-typedef struct s_data
-{
-	str_	response_message;
-	str_	request_message;
-}	t_data;
+
 
 class IOMultiplexing
 {
@@ -46,8 +43,8 @@ class IOMultiplexing
 		fd_set	_readfds;
 		fd_set	_writefds;
 	
-		struct timeval		_timeout;
-		map_fd_data_		_fd_data;
+		struct timeval				_timeout;
+		map_fd_MessageManagement_	_fd_MessageManagement;
 
 	public:
 		IOMultiplexing(std::vector<int> vec_ports);
