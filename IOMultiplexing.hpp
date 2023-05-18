@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cstring>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +20,7 @@
 #include <signal.h>
 
 #include "./utils.hpp"
+#include "./IOM_utils.hpp"
 #include "./MessageManagement.hpp"
 
 #define str_ std::string

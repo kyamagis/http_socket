@@ -10,16 +10,18 @@
 
 #include "./utils.hpp"
 #include "./ResponseMessage.hpp"
+#include "./Request.hpp"
 
 #define deq_response_message_ std::deque<ResponseMessage>
 
-class MessageManagement
+class Request;
+
+class MessageManagement: public Request 
 {
 	private:
 		
 	public:
 		enum e_phase			request_phase;
-		str_					request_message;
 		deq_response_message_	deq_response_message;
 
 		MessageManagement();

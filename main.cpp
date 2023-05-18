@@ -27,3 +27,5 @@ int	main(int argc, char **argv)
 }
 
 // https://github.com/kyamagis/http_socket.git
+
+// git config --local alias.rmp '!git checkout master && git pull https://github.com/kyamagis/http_socket.git master && git checkout - && git merge master'
