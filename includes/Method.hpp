@@ -53,7 +53,7 @@ class Method
 		Method(const Request &r);
 		Method(const Method &rm);
 		Method &operator=(const Method &rhs);
-		~Method();
+		virtual ~Method();
 		
 		int		handleLocationRedirect();
 		int		handleLocation(const Server& server);
@@ -68,7 +68,7 @@ class Method
 		Value<str_>		getRequest_entity_body();
 		map_env_		setEnv();
 
-		virtual	int	exeMethod(const Server& server) {(void)server; return 0;};
+		virtual	int	exeMethod(const Server& server);
 
 };
 

@@ -182,3 +182,9 @@ Value<str_>		Method::getRequest_entity_body()
 {
 	return this->_request_entity_body;
 }
+
+int	Method::exeMethod(const Server& server) 
+{
+	(void)server; 
+	return 0;
+}

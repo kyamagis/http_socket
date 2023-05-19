@@ -260,26 +260,22 @@ void	Request::parseHeaders(const vec_str_ &request_headers)
 	for (; i < request_headers.size(); i++)
 	{
 		vec_split_a_header = utils::split_Str(request_headers[i], ": ");
-		if (vec_split_a_header.size() < 2)
-		{
-			this->status_code = 400;
-			continue ;
-		}
+
 		lower_str = request_utils::ft_strlwr(vec_split_a_header[0]);
-		if (lower_str == "content-type")
+		if (lower_str == "content-type" && 1 < vec_split_a_header.size())
 		{
 			Request::parseContentType(vec_split_a_header);
 		}
-		else if (lower_str == "content-length")
+		else if (lower_str == "content-length" && 1 < vec_split_a_header.size())
 		{
 				debug(request_headers[i]);
 			Request::parseContentLength(vec_split_a_header);
 		}
-		else if (lower_str == "transfer-encoding")
+		else if (lower_str == "transfer-encoding" && 1 < vec_split_a_header.size())
 		{
 			Request::parseTransferEncoding(vec_split_a_header);
 		}
-		else if (lower_str == "connection")
+		else if (lower_str == "connection" && 1 < vec_split_a_header.size())
 		{
 			Request::parseConnection(vec_split_a_header);
 		}

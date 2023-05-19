@@ -99,6 +99,7 @@ int GET::exeMethod(const Server &server)
 	int status_code;
 	str_ contents_path;
 
+	debug("GET() exeMethod");
 	status_code = Method::handleLocation(server);
 	if (status_code != 200)
 		return status_code;
@@ -106,7 +107,7 @@ int GET::exeMethod(const Server &server)
 		return 405;
 	contents_path = Method::makeContentsPath(server);
 
-	status_code = GET::_dealWithIndexAndAutoindex(contents_path);
+	status_code = GET::_dealWithIndexAndAutoindex(contents_path);	
 	if (status_code != CONTINUE)
 	{
 		return status_code;
