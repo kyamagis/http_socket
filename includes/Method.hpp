@@ -53,7 +53,7 @@ class Method
 		Method(const Request &r);
 		Method(const Method &rm);
 		Method &operator=(const Method &rhs);
-		~Method();
+		virtual ~Method();
 		
 		int		handleLocationRedirect();
 		int		handleLocation(const Server& server);

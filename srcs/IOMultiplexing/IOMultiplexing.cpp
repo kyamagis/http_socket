@@ -4,7 +4,7 @@
 #define DEQ_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message
 #define RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message[0].response_message
 #define MAKE_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].makeResponseMessage(accepted_socket, this->_servers)
-#define DEQ_METHOD this->_fd_MessageManagement[accepted_socket].deq_method
+#define METHOD_P this->_fd_MessageManagement[accepted_socket].method_p
 #define REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].request_message
 #define PARSE_REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].parseRequstMessage()
 #define INIT_REQUEST_CLASS this->_fd_MessageManagement[accepted_socket].initResponseClass()
@@ -159,7 +159,8 @@ void	IOMultiplexing::storeRequestToMap(int accepted_socket)
 		DEQ_RESPONSE_MESSAGE.push_back(MAKE_RESPONSE_MESSAGE);
 		debug(this->_fd_MessageManagement[accepted_socket]);
 		INIT_REQUEST_CLASS;
-		DEQ_METHOD.pop_back();
+		delete METHOD_P;
+		METHOD_P = NULL;
 	}
 }
 

@@ -34,7 +34,7 @@ class MessageManagement: public Request, public Response
 	private:
 		
 	public:
-		deq_Method_						deq_method;
+		Method	*method_p;
 		std::deque<t_response_message>	deq_response_message;
 
 		MessageManagement();

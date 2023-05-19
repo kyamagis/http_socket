@@ -5,14 +5,17 @@
 #define REQUEST_INIT_CLASS this->_fd_MessageManagement[accepted_socket].initResponseClass()
 #define REQUEST_PARSE_ENTITY_BODY this->_fd_MessageManagement[accepted_socket].parseRequestEntityBody()
 
-MessageManagement::MessageManagement(): Request()
+MessageManagement::MessageManagement(): Request(), method_p(NULL)
 {
-
+	
 }
 	
 MessageManagement::~MessageManagement()
 {
-
+	if (method_p != NULL)
+	{
+		delete method_p;
+	}
 }
 
 MessageManagement::MessageManagement(const MessageManagement &t): Request(), Response()
@@ -26,7 +29,7 @@ MessageManagement &MessageManagement::operator=(const MessageManagement &rhs)
 	{
 		this->request_phase        = rhs.request_phase;
 		this->request_message      = rhs.request_message;
-		this->deq_method = rhs.deq_method;
+		this->method_p = rhs.method_p;
 	}
 	return *this;
 }
@@ -75,25 +78,25 @@ int MessageManagement::storeMethodToDeq()
 {
 	if (this->status_code != 200)
 	{
-		this->deq_method.push_back(ErrorRequest(*this, this->status_code));
+		this->method_p = new ErrorRequest(*this, this->status_code);
 		return this->status_code;
 	}
 	else if (this->method == "GET")
 	{
-		this->deq_method.push_back(GET(*this));		
+		this->method_p = new GET(*this);		
 		return 200;
 	}
 	else if (this->method == "POST")
 	{
-		this->deq_method.push_back(POST(*this));
+		this->method_p = new POST(*this);
 		return 200;
 	}
 	else if (this->method == "DELETE")
 	{
-		this->deq_method.push_back(DELETE(*this));
+		this->method_p = new DELETE(*this);
 		return 200;
 	}
-	this->deq_method.push_back(ErrorRequest(*this, 405));
+	this->method_p = new ErrorRequest(*this, 405);
 	return 405;
 }
 
@@ -112,11 +115,11 @@ t_response_message	MessageManagement::makeResponseMessage(int accepted_socket, c
 
 	if (local_status_code == 200)
 	{
-		local_status_code = this->deq_method.back().exeMethod(server);
+		local_status_code = this->method_p->exeMethod(server);
 	}
 	if (local_status_code == 301)
 	{
-		response_message.response_message = Response::redirectionResponseMessage(this->deq_method.back().getResponse_redirect_uri(),
+		response_message.response_message = Response::redirectionResponseMessage(this->method_p->getResponse_redirect_uri(),
 													server);
 		return response_message;
 	}
@@ -125,12 +128,12 @@ t_response_message	MessageManagement::makeResponseMessage(int accepted_socket, c
 		response_message.response_message = Response::errorResponseMessage(local_status_code, server);
 		return response_message;
 	}
-	if (this->deq_method.back().connection.getValue() == CONNECTION_KEEP_ALIVE)
+	if (this->method_p->connection.getValue() == CONNECTION_KEEP_ALIVE)
 		response_message.connection_flg = CONNECTION_KEEP_ALIVE;
 	response_message.response_message = Response::okResponseMessage(local_status_code,
-																	this->deq_method.back().getResponse_entity_body(),
-																	 this->deq_method.back().getContentType(),
-																	 this->deq_method.back().connection,
+																	this->method_p->getResponse_entity_body(),
+																	 this->method_p->getContentType(),
+																	 this->method_p->connection,
 																	server);
 	return response_message;
 }
