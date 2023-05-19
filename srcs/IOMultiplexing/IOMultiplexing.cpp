@@ -1,9 +1,14 @@
-#include "./IOMultiplexing.hpp"
+#include "../../includes/IOMultiplexing.hpp"
 
 #define BUFF_SIZE 10240
 #define DEQ_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message
 #define RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message[0].response_message
+#define MAKE_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].makeResponseMessage(accepted_socket, this->_servers)
+#define DEQ_METHOD this->_fd_MessageManagement[accepted_socket].deq_method
 #define REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].request_message
+#define PARSE_REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].parseRequstMessage()
+#define INIT_REQUEST_CLASS this->_fd_MessageManagement[accepted_socket].initResponseClass()
+
 
 IOMultiplexing::IOMultiplexing()
 {
@@ -21,7 +26,7 @@ IOMultiplexing &IOMultiplexing::operator=(const IOMultiplexing &rhs)
 	return *this;
 }
 
-IOMultiplexing::IOMultiplexing(std::vector<int> vec_ports)
+IOMultiplexing::IOMultiplexing(const vec_sever_	&servers, const vec_int_ &vec_ports): _servers(servers)
 {
 	IOMultiplexing::createVecListeningSocket(vec_ports);
 	IOMultiplexing::initMasterReadfds();
@@ -38,13 +43,13 @@ IOMultiplexing::~IOMultiplexing()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void	IOMultiplexing::createVecListeningSocket(std::vector<int> vec_ports)
+void	IOMultiplexing::createVecListeningSocket(const vec_int_ &vec_ports)
 {
 	int	listening_socket;
 
 	for (size_t i = 0; i < vec_ports.size(); i++)
 	{
-		listening_socket = utils::createListeningSocket(vec_ports[i]);
+		listening_socket = IOM_utils::createListeningSocket(vec_ports[i]);
 		std::cout << "port: " << vec_ports[i];
 		if (listening_socket == -1)
 		{
@@ -75,6 +80,8 @@ void IOMultiplexing::initMasterReadfds()
 
 void	IOMultiplexing::sendResponse(int accepted_socket)
 {
+	if (DEQ_RESPONSE_MESSAGE.size() == 0)
+		return ;
 	ssize_t	sent_len = send(accepted_socket, RESPONSE_MESSAGE.c_str(), RESPONSE_MESSAGE.size(), MSG_DONTWAIT);
 
 	if (sent_len == -1)
@@ -117,6 +124,8 @@ void	IOMultiplexing::createAcceptedSocket(int listening_socket)
 
 	while(true)
 	{
+		if (this->_max_descripotor == FD_SETSIZE - 1)
+			return ;
 		accepted_socket = accept(listening_socket, NULL, NULL);
 		if (accepted_socket == -1)
 		{
@@ -134,24 +143,23 @@ void	IOMultiplexing::createAcceptedSocket(int listening_socket)
 	}
 }
 
-
+/* 基底回数以上になったら、閉じる動作を入れる */
 void	IOMultiplexing::storeRequestToMap(int accepted_socket)
 {
 	char	buffer[BUFF_SIZE + 1];
 
-	if (!utils::recvRequest(accepted_socket, buffer))
+	if (!IOM_utils::recvRequest(accepted_socket, buffer))
 		return ;
 
 	REQUEST_MESSAGE += buffer;
-
-	//if (REQUEST_MESSAGE.find("\r\n\r\n") != str_::npos)
-	
-	if (buffer[BUFF_SIZE - 1] == '\0')
+	if (PARSE_REQUEST_MESSAGE == END)
 	{
 		FD_CLR(accepted_socket, &this->_master_readfds);
 		FD_SET(accepted_socket, &this->_master_writefds);
-		DEQ_RESPONSE_MESSAGE.push_back(utils::makeResponseMessage(REQUEST_MESSAGE));
-		REQUEST_MESSAGE.clear();
+		DEQ_RESPONSE_MESSAGE.push_back(MAKE_RESPONSE_MESSAGE);
+		debug(this->_fd_MessageManagement[accepted_socket]);
+		INIT_REQUEST_CLASS;
+		DEQ_METHOD.pop_back();
 	}
 }
 
@@ -161,8 +169,8 @@ void	IOMultiplexing::IOMultiplexingLoop()
 
 	while(true)
 	{
-		memcpy(&this->_writefds, &this->_master_writefds, sizeof(this->_master_writefds));
-		memcpy(&this->_readfds, &this->_master_readfds, sizeof(_master_readfds));
+		std::memcpy(&this->_writefds, &this->_master_writefds, sizeof(this->_master_writefds));
+		std::memcpy(&this->_readfds, &this->_master_readfds, sizeof(_master_readfds));
 		ready = select(this->_max_descripotor + 1, &this->_readfds, &this->_writefds, NULL, &this->_timeout);
 		if (ready == 0)
 		{

@@ -1,32 +1,37 @@
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -MMD -MP
-SRCS = ./main.cpp \
-		./IOMultiplexing.cpp \
-		./utils.cpp \
-		./ResponseMessage.cpp \
-		./MessageManagement.cpp \
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address
 
-OBJS = $(SRCS:.cpp=.o)
-NAME = ./serv
+INCLUDES = -I ./includes
+
+SRCDIR = srcs
+OBJDIR = objs
+
+SRCS = $(shell find $(SRCDIR) -type f -name "*.cpp")
+OBJS = $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+
+NAME = webserv
+
+$(NAME): $(OBJDIR) $(OBJS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
+
+$(OBJDIR):
+	mkdir $(shell find $(SRCDIR) -type d | sed 's/^$(SRCDIR)/$(OBJDIR)/g')
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
-
-# $(NAME): $(OBJS)
-# 		ar r $(NAME) $(OBJS)
-
-test: all
-	./serv 8080 8081 8082
-
 clean:
-	rm -f $(OBJS)
+	rm -rf $(OBJDIR)
 
 fclean: clean
-	rm -f $(NAME)
-	rm -f *.d
+	$(RM) $(NAME)
 
 re: fclean all
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
+
+
+test: all
+	./webserv config/default.conf
 
 .PHONY: all clean fclean re test

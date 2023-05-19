@@ -1,54 +1,24 @@
 
-#include "./utils.hpp"
+#include "../../includes/IOM_utils.hpp"
 
-namespace utils
+#define vec_str_ std::vector<str_>
+
+namespace IOM_utils
 {
-	void	putError(str_ error_str)
-	{
-		std::cerr << error_str << ": " << strerror(errno) << std::endl;
-	}
-
-	void	exitWithPutError(str_ error_str)
-	{
-		putError(error_str);
-		std::exit(EXIT_FAILURE);
-	}
-
 	int	x_socket(int domain, int type, int protocol)
 	{
 		int	serv_socket = socket(domain, type, protocol);
 		if (serv_socket == -1)
 		{
-			putError("socket() failed");
+			utils::putError("socket() failed");
 			return -1;
 		}
 		return serv_socket;
 	}
 
-	void	x_close(int serv_socket, int line)
-	{
-		int error_flg = close(serv_socket);
-		if (error_flg == -1)
-		{
-			std::cerr << "close() failed : " 
-						<< strerror(errno) 
-						<< " : line = " << line << std::endl;
-			std::exit(EXIT_FAILURE);
-		}
-	}
-
-	void	x_close(int serv_socket)
-	{
-		int error_flg = close(serv_socket);
-		if (error_flg == -1)
-		{
-			exitWithPutError("close() failed");
-		}
-	}
-
 	void	setSockaddr_in(int port, struct sockaddr_in *addr)
 	{
-		memset(addr, 0, sizeof(*addr));
+		std::memset(addr, 0, sizeof(*addr));
 		addr->sin_addr.s_addr		= htonl(LOCAL_HOST);
 		addr->sin_family			= AF_INET;
 		addr->sin_port				= htons(port);
@@ -60,8 +30,8 @@ namespace utils
 
 		if (setsockopt(serv_socket, level, optname, (const char *)&option_value, sizeof(option_value)) == -1)
 		{
-			putError("setsockopt() failed");
-			x_close(serv_socket);
+			utils::putError("setsockopt() failed");
+			utils::x_close(serv_socket);
 			return -1;
 		}
 		return 0;
@@ -71,7 +41,7 @@ namespace utils
 	{
 		if (bind(serv_socket, (struct sockaddr *)&addr, addr_len) == -1)
 		{
-			x_close(serv_socket);
+			utils::x_close(serv_socket);
 			return -1;
 		}
 		return 0;
@@ -81,8 +51,8 @@ namespace utils
 	{
 		if (fcntl(fd, cmd, flg) == -1)
 		{
-			putError("fcntl() failed");
-			x_close(fd);
+			utils::putError("fcntl() failed");
+			utils::x_close(fd);
 			return -1;
 		}
 		return 0;
@@ -92,8 +62,8 @@ namespace utils
 	{
 		if (listen(serv_socket, backlog) == -1)
 		{
-			putError("listen() failed");
-			x_close(serv_socket);
+			utils::putError("listen() failed");
+			utils::x_close(serv_socket);
 			return -1;
 		}
 		return 0;
@@ -128,13 +98,13 @@ namespace utils
 	{
 		ssize_t recved_len = 1;
 
-		memset(buffer, '\0', BUFF_SIZE + 1);
+		std::memset(buffer, '\0', BUFF_SIZE + 1);
 		recved_len = recv(accepted, buffer, BUFF_SIZE, MSG_DONTWAIT);
 		if (recved_len == -1)
 		{
 			if (errno != EWOULDBLOCK)
 			{
-				exitWithPutError("accept() failed");
+				utils::exitWithPutError("accept() failed");
 			}
 			debug("recv == -1");
 			return false;
