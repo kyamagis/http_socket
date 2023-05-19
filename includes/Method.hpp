@@ -68,7 +68,7 @@ class Method
 		Value<str_>		getRequest_entity_body();
 		map_env_		setEnv();
 
-		virtual	int	exeMethod(const Server& server) {(void)server; return 0;};
+		virtual	int	exeMethod(const Server& server);
 
 };
 

@@ -73,7 +73,6 @@ Server	MessageManagement::searchServerWithMatchingPortAndHost(int accepted_socke
 
 int MessageManagement::storeMethodToDeq()
 {
-	
 	if (this->status_code != 200)
 	{
 		this->deq_method.push_back(ErrorRequest(*this, this->status_code));
@@ -81,7 +80,7 @@ int MessageManagement::storeMethodToDeq()
 	}
 	else if (this->method == "GET")
 	{
-		this->deq_method.push_back(GET(*this));
+		this->deq_method.push_back(GET(*this));		
 		return 200;
 	}
 	else if (this->method == "POST")
@@ -119,7 +118,6 @@ t_response_message	MessageManagement::makeResponseMessage(int accepted_socket, c
 	{
 		response_message.response_message = Response::redirectionResponseMessage(this->deq_method.back().getResponse_redirect_uri(),
 													server);
-		
 		return response_message;
 	}
 	if (local_status_code != 200)
