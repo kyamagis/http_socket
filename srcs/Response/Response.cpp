@@ -64,17 +64,17 @@ str_	Response::_commonResponseMessage(const int status_code, const Server &serve
 	response_message = "HTTP/1.1 " + this->map_status[status_code];
 	response_message += "Date: " + Response::_getGMT();
 	response_message += "Server: " + server.server_name.getValue() + "\r\n";
-	response_message += "Connection: close\r\n";
 	return (response_message);
 }
 
 #define	IS_FOUND_REDIRECTION_URI response_redirect_uri.getStatus()
 #define REDIRECTION_URI response_redirect_uri.getValue()
 
-str_	Response::redirectionResponseMessage(const Value<str_> &response_redirect_uri, RValue<bool> connect, const Server &server)
+str_	Response::redirectionResponseMessage(const Value<str_> &response_redirect_uri, const Server &server)
 {
 	str_	response_message = Response::_commonResponseMessage(301, server);
-
+	
+	response_message += "Connection: close\r\n";
 	if (IS_FOUND_REDIRECTION_URI != NOT_SET)
 	{
 		response_message += "Location: " + REDIRECTION_URI + "\r\n";
@@ -82,10 +82,11 @@ str_	Response::redirectionResponseMessage(const Value<str_> &response_redirect_u
 	return response_message + "\r\n";
 }
 
-str_	Response::errorResponseMessage(const int status_code, RValue<bool> connect, const Server &server)
+str_	Response::errorResponseMessage(const int status_code, const Server &server)
 {
 	str_	response_message = Response::_commonResponseMessage(status_code, server);
 
+	response_message += "Connection: close\r\n";
 	if (server.error_pages.getStatus() != NOT_SET)
 	{
 		return response_message + Response::_searchErrorPage(status_code, server);
@@ -101,6 +102,10 @@ str_		Response::okResponseMessage(const int status_code,
 {
 	str_	response_message = Response::_commonResponseMessage(status_code, server);
 
+	if (connect.getValue() == CONNECTION_KEEP_ALIVE)
+		response_message += "Connection: keep-alive\r\n";
+	else
+		response_message += "Connection: close\r\n";
 	if (response_entity_body.getStatus() != NOT_SET)
 	{
 		str_	str_response_entity_body = response_entity_body.getValue();

@@ -13,8 +13,6 @@ class DELETE : public Method
 		DELETE(const Request& r);
 		virtual	~DELETE();
 
-		virtual int	parseHeaders();
-		virtual int	parseRequestMessage();
 		virtual int	exeMethod(const Server& server);
 
 		int	_dealWithIndexAndAutoindex(str_ &contents_path);

@@ -18,25 +18,33 @@
 #include "./Response.hpp"
 
 #define deq_Method_ std::deque<Method>
+#define deq_res_ std::deque<Method>
 #define vec_sever_ std::vector<Server>
 
 class Request;
+
+typedef struct s_response_message
+{
+	bool	connection_flg;
+	str_	response_message;
+}	t_response_message;
 
 class MessageManagement: public Request, public Response 
 {
 	private:
 		
 	public:
-		deq_Method_	deq_method;
+		deq_Method_						deq_method;
+		std::deque<t_response_message>	deq_response_message;
 
 		MessageManagement();
 		MessageManagement(const MessageManagement &t);
 		MessageManagement &operator=(const MessageManagement &rhs);
 		~MessageManagement();
 
-		str_	makeResponseMessage(int accepted_socket, const vec_sever_ &servers);
-		Server	searchServerWithMatchingPortAndHost(int accepted_socket, const vec_sever_ &servers);
-		int 	storeMethodToDeq();
+		t_response_message	makeResponseMessage(int accepted_socket, const vec_sever_ &servers);
+		Server				searchServerWithMatchingPortAndHost(int accepted_socket, const vec_sever_ &servers);
+		int 				storeMethodToDeq();
 
 };
 

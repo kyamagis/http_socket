@@ -14,8 +14,6 @@ class POST : public Method
 		POST(const Request& r);
 		virtual	~POST();
 
-		virtual int	parseHeaders();
-		virtual int	parseRequestMessage();
 		virtual int	exeMethod(const Server& server);
 };
 

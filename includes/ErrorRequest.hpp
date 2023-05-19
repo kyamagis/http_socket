@@ -13,8 +13,6 @@ class ErrorRequest : public Method
 		ErrorRequest(const Request& r, int status_code);
 		virtual	~ErrorRequest();
 
-		virtual int	parseHeaders();
-		virtual int	parseRequestMessage();
 		virtual int	exeMethod(const Server& server);
 };
 

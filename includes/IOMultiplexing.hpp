@@ -30,7 +30,7 @@
 #define map_ite_ std::map<int, MessageManagement>::iterator
 #define vec_sever_ std::vector<Server>
 
-
+class MessageManagement;
 
 class IOMultiplexing
 {

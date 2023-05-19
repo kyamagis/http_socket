@@ -239,7 +239,7 @@ void	Request::parseConnection(const vec_str_ &vec_split_a_header)
 		this->connection.setValue(CONNECTION_CLOSE);
 		return ;
 	}
-	else if (request_utils::ft_strlwr(vec_split_a_header[1]) != "keep-alive")
+	else if (request_utils::ft_strlwr(vec_split_a_header[1]) == "keep-alive")
 	{
 		this->connection.setValue(CONNECTION_KEEP_ALIVE);
 		return ;

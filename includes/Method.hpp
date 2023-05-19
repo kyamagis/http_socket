@@ -15,6 +15,8 @@
 
 typedef std::map<std::string, std::string>	map_env_;
 
+class Request;
+
 class Method
 {
 	protected:

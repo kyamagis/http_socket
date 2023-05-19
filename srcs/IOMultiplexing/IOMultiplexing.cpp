@@ -1,8 +1,10 @@
 #include "../../includes/IOMultiplexing.hpp"
 
 #define BUFF_SIZE 10240
-#define DEQ_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_method
-#define RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_method[0].response_message
+#define DEQ_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message
+#define RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message[0].response_message
+#define MAKE_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].makeResponseMessage(accepted_socket, this->_servers)
+#define DEQ_METHOD this->_fd_MessageManagement[accepted_socket].deq_method
 #define REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].request_message
 #define PARSE_REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].parseRequstMessage()
 #define INIT_REQUEST_CLASS this->_fd_MessageManagement[accepted_socket].initResponseClass()
@@ -154,9 +156,10 @@ void	IOMultiplexing::storeRequestToMap(int accepted_socket)
 	{
 		FD_CLR(accepted_socket, &this->_master_readfds);
 		FD_SET(accepted_socket, &this->_master_writefds);
-		DEQ_RESPONSE_MESSAGE.push_back(IOM_utils::makeResponseMessage(REQUEST_MESSAGE));
+		DEQ_RESPONSE_MESSAGE.push_back(MAKE_RESPONSE_MESSAGE);
 		debug(this->_fd_MessageManagement[accepted_socket]);
 		INIT_REQUEST_CLASS;
+		DEQ_METHOD.pop_back();
 	}
 }
 

@@ -31,8 +31,8 @@ class Response
 		map_wday_	map_wday;
 		map_month_	map_month;
 
-		str_		redirectionResponseMessage(const Value<str_> &response_redirect_uri, RValue<bool> connect,const Server &server);
-		str_		errorResponseMessage(const int status_code, RValue<bool> connect, const Server &server);
+		str_		redirectionResponseMessage(const Value<str_> &response_redirect_uri, const Server &server);
+		str_		errorResponseMessage(const int status_code, const Server &server);
 		str_		okResponseMessage(const int status_code, 
 										Value<str_> response_entity_body,
 										str_ content_type,

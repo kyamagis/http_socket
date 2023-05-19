@@ -98,40 +98,51 @@ int MessageManagement::storeMethodToDeq()
 	return 405;
 }
 
-str_	MessageManagement::makeResponseMessage(int accepted_socket, const vec_sever_ &servers)
+
+t_response_message	MessageManagement::makeResponseMessage(int accepted_socket, const vec_sever_ &servers)
 {
 	// sigchildを無視することで、子プロセスの終了を親プロセスが待たないようにする。<= やる意味がわからない
 	// これを実行すると、waitpid()からexecve()の失敗を検知できない。それでもいいのか？
 	// signal(SIGCHLD, SIG_IGN);
+	t_response_message	response_message;
+
+	response_message.connection_flg = CONNECTION_CLOSE;
 
 	Server	server = MessageManagement::searchServerWithMatchingPortAndHost(accepted_socket, servers);
 	int		local_status_code = MessageManagement::storeMethodToDeq();
 
 	if (local_status_code == 200)
 	{
-		local_status_code = deq_method.back().exeMethod(server);
+		local_status_code = this->deq_method.back().exeMethod(server);
 	}
 	if (local_status_code == 301)
 	{
-		return (Response::redirectionResponseMessage(deq_method.back().getResponse_redirect_uri(),
-													deq_method.back().connection,
-													server));
+		response_message.response_message = Response::redirectionResponseMessage(this->deq_method.back().getResponse_redirect_uri(),
+													server);
+		
+		return response_message;
 	}
 	if (local_status_code != 200)
 	{
-		return (Response::errorResponseMessage(local_status_code, deq_method.back().connection, server));
+		response_message.response_message = Response::errorResponseMessage(local_status_code, server);
+		return response_message;
 	}
-	return (Response::okResponseMessage(local_status_code,
-									   deq_method.back().getResponse_entity_body(),
-									   deq_method.back().getContentType(),
-									   deq_method.back().connection,
-									   server));
+	if (this->deq_method.back().connection.getValue() == CONNECTION_KEEP_ALIVE)
+		response_message.connection_flg = CONNECTION_KEEP_ALIVE;
+	response_message.response_message = Response::okResponseMessage(local_status_code,
+																	this->deq_method.back().getResponse_entity_body(),
+																	 this->deq_method.back().getContentType(),
+																	 this->deq_method.back().connection,
+																	server);
+	return response_message;
 }
 
 
 
 std::ostream &operator<<(std::ostream &ostrm, const MessageManagement &req)
 {
+	ostrm << "++++++++++++++++++++++++++++++++++" << std::endl;
+
 	ostrm << req.method << " " << req.uri << " " << req.version << std::endl;
 
 	ostrm << "Host:              " << req.host.getValue() << std::endl;
