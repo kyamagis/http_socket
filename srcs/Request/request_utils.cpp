@@ -273,31 +273,17 @@ namespace request_utils
 		return writeFile(file_content, file_name);
 	}
 
-	static bool isEachExtension(const str_ &contents_path, const str_ &extention_look_for)
-	{
-		if (contents_path.find(extention_look_for) == std::string::npos)
-		{
-			return false;
-		}
-		size_t extension_len = extention_look_for.size();
-		if (contents_path.size() - contents_path.rfind(extention_look_for) != extension_len)
-		{
-			return false;
-		}
-		return true;
-	}
-
 	str_ discriminateExtension(const str_ &contents_path)
 	{
-		if (isEachExtension(contents_path, ".jpg"))
+		if (utils::contentEachExtension(contents_path, ".jpg"))
 		{
 			return "image/jpg";
 		}
-		else if (isEachExtension(contents_path, ".html"))
+		else if (utils::contentEachExtension(contents_path, ".html"))
 		{
 			return "text/html";
 		}
-		else if (isEachExtension(contents_path, ".css"))
+		else if (utils::contentEachExtension(contents_path, ".css"))
 		{
 			return "text/css";
 		}

@@ -42,7 +42,6 @@ int POST::_dealWithIndexAndAutoindex(str_ &contents_path)
 	int status_code = 0;
 	if (this->uri == this->_location.path.getValue())
 	{
-		printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=\n");
 		status_code = Method::joinIndex(contents_path);
 		if (status_code == 200 && this->_location.cgi_path.getStatus() == NOT_SET) // cgiを使用しないのに、indexファイルをPOSTの対象にする場合は、エラー
 		{

@@ -15,7 +15,6 @@
 # include	<cstdlib>
 # include	<unistd.h>
 # include 	<strings.h>
-# include	<string.h>
 # include	"signal.h"
 # include	<sys/time.h>
 # include	<sys/types.h>
@@ -67,6 +66,7 @@ namespace utils
 	str_ 	intToStr(int num);
 	void	x_close(int serv_socket, int line);
 	void	x_close(int serv_socket);
+	bool	contentEachExtension(const str_ &contents_path, const str_ &extention_look_for);
 }
 
 
