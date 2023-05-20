@@ -99,7 +99,6 @@ int GET::exeMethod(const Server &server)
 	int status_code;
 	str_ contents_path;
 
-	debug("GET() exeMethod");
 	status_code = Method::handleLocation(server);
 	if (status_code != 200)
 		return status_code;
