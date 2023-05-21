@@ -88,7 +88,7 @@ int CGI::_readPipefdRead(int readfd)
 			return 500;
 		}
 		buff[len] = '\0';
-		this->_result += buff;
+		this->_cgi_exec_result += buff;
 		if (len < READ_LEN)
 		{
 			return 200;
@@ -197,7 +197,7 @@ int CGI::exeCGI()
 	return status_code;
 }
 
-str_ CGI::getResult()
+str_ CGI::getCGIExecResult()
 {
-	return this->_result;
+	return this->_cgi_exec_result;
 }

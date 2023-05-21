@@ -14,6 +14,13 @@
 
 typedef std::map<std::string, std::string>	map_env_;
 
+enum e_cgi_phase
+{
+	CGI_start,
+	CGT_write,
+	CGI_read
+};
+
 class CGI
 {
 	private:
@@ -28,10 +35,10 @@ class CGI
 		const str_	_request_entity_body;
 		char		**_envp;
 
-		str_		_result;
+		str_		_cgi_exec_result;
 		
-		int			pipefd_for_read_cgi_execution_result[2];
-		int			pipefd_for_send_request_entity_body_to_cgi[2];
+		int		pipefd_for_read_cgi_execution_result[2];
+		int		pipefd_for_send_request_entity_body_to_cgi[2];
 
 		void	_x_execve(char **argv);
 		int		_x_pipe();
@@ -47,7 +54,10 @@ class CGI
 			, const str_& request_entity_body);
 
 		int		exeCGI();
-		str_	getResult();
+		str_	getCGIExecResult();
+
+		enum e_cgi_phase	manageCGIOperation;
+
 };
 
 #endif

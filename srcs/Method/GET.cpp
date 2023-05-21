@@ -39,7 +39,7 @@ int GET::_exeCGI(const str_ &contents_path)
 	int status_code = cgi.exeCGI();
 	if (status_code != 200)
 		return status_code;
-	this->_response_entity_body.setValue(cgi.getResult());
+	this->_response_entity_body.setValue(cgi.getCGIExecResult());
 	this->_response_content_type = "text/plane";
 	return status_code;
 }
