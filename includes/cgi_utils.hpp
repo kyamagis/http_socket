@@ -3,7 +3,6 @@
 
 #include "./utils.hpp"
 
-
 namespace cgi_utils
 {
 	void	closePutError(int fd);
