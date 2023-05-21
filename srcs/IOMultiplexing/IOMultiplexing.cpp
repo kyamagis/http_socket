@@ -185,19 +185,19 @@ void	IOMultiplexing::IOMultiplexingLoop()
 			{
 				if (FD_ISSET(fd, &this->_writefds))
 				{
-					sendResponse(fd);
+					IOMultiplexing::sendResponse(fd);
 					std::cout << "clnt_socket: " <<  fd << ", max_descripotor: " 
 								<< this->_max_descripotor << std::endl;
 				}
 				else if (FD_ISSET(fd, &this->_readfds))
 				{
-					if (containsListeningSocket(fd))
+					if (IOMultiplexing::containsListeningSocket(fd))
 					{
-						createAcceptedSocket(fd);
+						IOMultiplexing::createAcceptedSocket(fd);
 					}
 					else
 					{
-						storeRequestToMap(fd);
+						IOMultiplexing::storeRequestToMap(fd);
 					}
 				}
 			}
