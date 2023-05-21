@@ -21,12 +21,15 @@ class CGI
 		CGI(const CGI &cgi);
 		CGI &operator=(const CGI &rhs);
 
-		str_		_result;
-		map_env_	_map_env;
-		str_		_file_path;
-		char		**_envp;
+		const str_	_method;
 		const str_	_cgi_path;
-		Value<str_>	_request_entity_body;
+		map_env_	_map_env;
+		const str_	_file_path;
+		const str_	_request_entity_body;
+		char		**_envp;
+
+		str_		_result;
+		
 		int			pipefd_for_read_cgi_execution_result[2];
 		int			pipefd_for_send_request_entity_body_to_cgi[2];
 
@@ -40,11 +43,8 @@ class CGI
 
 	public:
 
-		CGI(str_ cgi_path, map_env_ map_env, const str_ &file_path
-			, const Value<str_>& request_entity_body);
-
-		CGI(str_ cgi_path_arg, map_env_	map_env, const Value<str_>& file_path, //消す
-			const Value<str_>& request_entity_body);
+		CGI(str_ method, str_ cgi_path, map_env_ map_env, const str_ &file_path
+			, const str_& request_entity_body);
 
 		int		exeCGI();
 		str_	getResult();

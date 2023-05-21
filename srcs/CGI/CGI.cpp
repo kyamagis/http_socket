@@ -16,11 +16,13 @@ CGI &CGI::operator=(const CGI &rhs)
 	return *this;
 }
 
-CGI::CGI(str_ cgi_path, map_env_ map_env, const str_ &file_path, const Value<str_> &request_entity_body) : _map_env(map_env),
-																										   _file_path(file_path),
-																										   _envp(NULL),
-																										   _cgi_path(cgi_path),
-																										   _request_entity_body(request_entity_body)
+CGI::CGI(str_ method, str_ cgi_path, map_env_ map_env, const str_ &file_path, const str_ &request_entity_body): 
+			_method(method),
+			_cgi_path(cgi_path),
+			_map_env(map_env),
+			_file_path(file_path),
+			_request_entity_body(request_entity_body),
+			_envp(NULL)
 {
 	;
 }
@@ -53,7 +55,7 @@ void CGI::_exeExecve()
 {
 	str_ command_line_options = this->_cgi_path + " " + this->_file_path;
 	char **argv = cgi_utils::makeCharDoublePointer(command_line_options);
-	if (this->_request_entity_body.getStatus() != NOT_SET)
+	if (_method == "POST")
 	{
 		utils::x_close(this->pipefd_for_send_request_entity_body_to_cgi[WRITE]);
 		cgi_utils::x_dup2(this->pipefd_for_send_request_entity_body_to_cgi[READ], STDIN_FILENO);
@@ -101,7 +103,7 @@ int CGI::_x_pipe()
 	{
 		return -1;
 	}
-	if (this->_request_entity_body.getStatus() == NOT_SET)
+	if (_method == "POST")
 	{
 		return 0;
 	}
@@ -122,7 +124,7 @@ int CGI::_send_request_entity_body_to_cgi(pid_t pid)
 	int fd = this->pipefd_for_send_request_entity_body_to_cgi[WRITE];
 	size_t start_index = 0;
 	str_ substr;
-	str_ request_entity_body = this->_request_entity_body.getValue();
+	str_ request_entity_body = this->_request_entity_body;
 	clock_t start_time = cgi_utils::getMicroSec();
 
 	while (true)
@@ -153,7 +155,7 @@ int CGI::_send_request_entity_body_to_cgi(pid_t pid)
 
 int CGI::_caseOfPOSTmethod(pid_t pid)
 {
-	if (this->_request_entity_body.getStatus() == NOT_SET)
+	if (_method == "POST")
 	{
 		return 200;
 	}

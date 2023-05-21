@@ -34,7 +34,7 @@ int GET::_readFileContents(const str_ &contents_path)
 
 int GET::_exeCGI(const str_ &contents_path)
 {
-	CGI cgi(CGI_PATH, Method::setEnv(), contents_path, this->_request_entity_body);
+	CGI cgi("GET", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
 
 	int status_code = cgi.exeCGI();
 	if (status_code != 200)
