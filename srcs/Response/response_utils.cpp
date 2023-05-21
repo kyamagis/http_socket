@@ -48,7 +48,23 @@ namespace response_utils
 		{
 			return "\r\n";
 		}
-		response_message = "Content-Type: text/plane\r\n";
+
+		if (utils::contentEachExtension(file_path, ".jpg"))
+		{
+			response_message = "Content-Type: image/jpg\r\n";
+		}
+		else if (utils::contentEachExtension(file_path, ".html"))
+		{
+			response_message = "Content-Type: text/html\r\n";
+		}
+		else if (utils::contentEachExtension(file_path, ".css"))
+		{
+			response_message = "Content-Type: text/css\r\n";
+		}
+		else
+		{
+			response_message = "Content-Type: text/plain\r\n";
+		}
 		response_message += "Content-Length: " + utils::to_string(entity_body.size()) + "\r\n\r\n";
 		return response_message + entity_body;
 	}

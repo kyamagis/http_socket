@@ -1,6 +1,8 @@
 
 #include "../includes/utils.hpp"
 
+#include <string.h>
+
 #define vec_str_ std::vector<str_>
 
 namespace utils
@@ -95,6 +97,20 @@ namespace utils
 		{
 			utils::exitWithPutError("close() failed");
 		}
+	}
+
+	bool contentEachExtension(const str_ &contents_path, const str_ &extention_look_for)
+	{
+		if (contents_path.find(extention_look_for) == std::string::npos)
+		{
+			return false;
+		}
+		size_t extension_len = extention_look_for.size();
+		if (contents_path.size() - contents_path.rfind(extention_look_for) != extension_len)
+		{
+			return false;
+		}
+		return true;
 	}
 }
 
