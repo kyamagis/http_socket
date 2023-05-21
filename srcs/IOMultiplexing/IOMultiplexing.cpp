@@ -46,9 +46,12 @@ IOMultiplexing::~IOMultiplexing()
 void	IOMultiplexing::createVecListeningSocket(const vec_int_ &vec_ports)
 {
 	int	listening_socket;
+	int	max_descripotor = 0;
 
 	for (size_t i = 0; i < vec_ports.size(); i++)
 	{
+		if (max_descripotor == FD_SETSIZE - 2)
+			return ;
 		listening_socket = IOM_utils::createListeningSocket(vec_ports[i]);
 		std::cout << "port: " << vec_ports[i];
 		if (listening_socket == -1)
@@ -60,6 +63,7 @@ void	IOMultiplexing::createVecListeningSocket(const vec_int_ &vec_ports)
 			this->_vec_listening_socket.push_back(listening_socket);
 			std::cout << ", fd: " << listening_socket << std::endl;
 		}
+		max_descripotor = listening_socket;
 	}
 }
 
@@ -185,19 +189,19 @@ void	IOMultiplexing::IOMultiplexingLoop()
 			{
 				if (FD_ISSET(fd, &this->_writefds))
 				{
-					sendResponse(fd);
+					IOMultiplexing::sendResponse(fd);
 					std::cout << "clnt_socket: " <<  fd << ", max_descripotor: " 
 								<< this->_max_descripotor << std::endl;
 				}
 				else if (FD_ISSET(fd, &this->_readfds))
 				{
-					if (containsListeningSocket(fd))
+					if (IOMultiplexing::containsListeningSocket(fd))
 					{
-						createAcceptedSocket(fd);
+						IOMultiplexing::createAcceptedSocket(fd);
 					}
 					else
 					{
-						storeRequestToMap(fd);
+						IOMultiplexing::storeRequestToMap(fd);
 					}
 				}
 			}

@@ -169,13 +169,11 @@ int CGI::exeCGI()
 
 	if (CGI::_x_pipe() == -1)
 	{
-		// printf("CGI: x_pipe\n");
 		return 500;
 	}
 	pid = fork();
 	if (pid == -1)
 	{
-		// printf("CGI: pid == -1\n");
 		return 500;
 	}
 	if (pid == 0)
