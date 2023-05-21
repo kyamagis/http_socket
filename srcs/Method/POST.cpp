@@ -16,10 +16,10 @@ POST::~POST() {}
 
 int POST::_exeCGI(const str_ &contents_path)
 {
-	if (PIPE_MAX <= this->request_entity_body.size())
+	if (PIPE_MAX <= this->request_entity_body.size()) // いらないかも
 		return 403;
 
-	CGI cgi(CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
+	CGI cgi("POST", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
 
 	int status_code = cgi.exeCGI();
 	if (status_code != 200)
