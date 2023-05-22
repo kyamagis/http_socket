@@ -31,7 +31,7 @@ int POST::_exeCGI(const str_ &contents_path)
 	}
 	str_ contents_directory_path = contents_path.substr(0, last_slash_index + 1); // ./content/index.html -> ./content/
 	str_ file_name = request_utils::createUniqueFileName(contents_directory_path, CONTENT_TYPE);
-	status_code = request_utils::makeAndPutFile(cgi.getResult(), file_name);
+	status_code = request_utils::makeAndPutFile(cgi.getCGIExecResult(), file_name);
 	return status_code;
 }
 
