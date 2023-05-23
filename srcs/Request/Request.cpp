@@ -100,7 +100,7 @@ void	Request::parseHost(const str_ &host_header)
 		this->status_code = 400;
 		return ;
 	}
-	if (request_utils::ft_strlwr(vec_host_header[0]) != "host:")
+	if (utils::ft_strlwr(vec_host_header[0]) != "host:")
 	{	
 		this->status_code = 400;
 		return ;
@@ -111,10 +111,10 @@ void	Request::parseHost(const str_ &host_header)
 		this->status_code = 400;
 		return ;
 	}
-	str_	lower_str = request_utils::ft_strlwr(vec_host_header[1]);
+	str_	lower_str = utils::ft_strlwr(vec_host_header[1]);
 	if (colon_pos != str_::npos)
 	{
-		this->port = request_utils::myStrToLL(&lower_str[colon_pos + 1]);
+		this->port = utils::myStrToLL(&lower_str[colon_pos + 1]);
 		if (this->port < 0x0 || 0xffff < this->port)
 		{
 			this->status_code = 400;
@@ -172,7 +172,7 @@ void Request::parseContentType(const vec_str_ &vec_split_a_header)
 		this->status_code = 400;
 		return ;
 	}
-	str_ lower_str = request_utils::ft_strlwr(vec_split_a_header[1]);
+	str_ lower_str = utils::ft_strlwr(vec_split_a_header[1]);
 	if (Request::parseMime(lower_str, vec_split_a_header) == 400)
 	{
 		this->status_code = 400;
@@ -192,7 +192,7 @@ void	Request::parseContentLength(const vec_str_ &vec_split_header)
 		this->status_code = 400;
 		return ;
 	}
-	long value = request_utils::myStrToLL(vec_split_header[1]);
+	long value = utils::myStrToLL(vec_split_header[1]);
 	if (value < 0)
 	{
 		this->status_code = 400;
@@ -213,7 +213,7 @@ void	Request::parseTransferEncoding(const vec_str_ &vec_split_a_header)
 		this->status_code = 400;
 		return ;
 	}
-	if (request_utils::ft_strlwr(vec_split_a_header[1]) != "chunked")
+	if (utils::ft_strlwr(vec_split_a_header[1]) != "chunked")
 	{
 		if (this->status_code == 200)
 			this->status_code = 501;
@@ -234,12 +234,12 @@ void	Request::parseConnection(const vec_str_ &vec_split_a_header)
 		this->status_code = 400;
 		return ;
 	}
-	if (request_utils::ft_strlwr(vec_split_a_header[1]) == "close")
+	if (utils::ft_strlwr(vec_split_a_header[1]) == "close")
 	{
 		this->connection.setValue(CONNECTION_CLOSE);
 		return ;
 	}
-	else if (request_utils::ft_strlwr(vec_split_a_header[1]) == "keep-alive")
+	else if (utils::ft_strlwr(vec_split_a_header[1]) == "keep-alive")
 	{
 		this->connection.setValue(CONNECTION_KEEP_ALIVE);
 		return ;
@@ -261,7 +261,7 @@ void	Request::parseHeaders(const vec_str_ &request_headers)
 	{
 		vec_split_a_header = utils::split_Str(request_headers[i], ": ");
 
-		lower_str = request_utils::ft_strlwr(vec_split_a_header[0]);
+		lower_str = utils::ft_strlwr(vec_split_a_header[0]);
 		if (lower_str == "content-type" && 1 < vec_split_a_header.size())
 		{
 			Request::parseContentType(vec_split_a_header);

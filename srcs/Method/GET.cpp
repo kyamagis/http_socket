@@ -32,17 +32,17 @@ int GET::_readFileContents(const str_ &contents_path)
 
 #define CGI_PATH this->_location.cgi_path.getValue()
 
-int GET::_exeCGI(const str_ &contents_path)
-{
-	CGI cgi("GET", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
+// int GET::_exeCGI(const str_ &contents_path)
+// {
+// 	CGI cgi("GET", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
 
-	int status_code = cgi.exeCGI();
-	if (status_code != 200)
-		return status_code;
-	this->_response_entity_body.setValue(cgi.getCGIExecResult());
-	this->_response_content_type = "text/plane";
-	return status_code;
-}
+// 	int status_code = cgi.exeCGI();
+// 	if (status_code != 200)
+// 		return status_code;
+// 	this->_response_entity_body.setValue(cgi.getCGIExecResult());
+// 	this->_response_content_type = "text/plane";
+// 	return status_code;
+// }
 
 int GET::_exeAutoindex(const str_ &directory_path)
 {
@@ -111,7 +111,7 @@ int GET::exeMethod(const Server &server)
 	{
 		return status_code;
 	}
-	if (this->_location.cgi_path.getStatus() != NOT_SET)
-		return GET::_exeCGI(contents_path);
+	// if (this->_location.cgi_path.getStatus() != NOT_SET)
+	// 	return GET::_exeCGI(contents_path);
 	return GET::_readFileContents(contents_path);
 }

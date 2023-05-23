@@ -18,9 +18,7 @@ typedef	std::map<int, str_> map_month_ ;
 
 namespace request_utils
 {
-	str_		ft_strlwr(const str_ &str);
 	size_t		hexStrToLL(const str_ &str, bool &over_flow);
-	long		myStrToLL(str_ str);
 	bool		isAtStrLast(const str_& str, const str_& to_find);
 	str_		joinPath(const str_& path_front, const str_& path_back);
 	str_		createUniqueFileName(const str_ &file_path, const str_& content_type);

@@ -16,6 +16,7 @@
 # include	<unistd.h>
 # include 	<strings.h>
 # include	"signal.h"
+# include	<fcntl.h>
 # include	<sys/time.h>
 # include	<sys/types.h>
 # include	<sys/wait.h>
@@ -67,6 +68,9 @@ namespace utils
 	void	x_close(int serv_socket, int line);
 	void	x_close(int serv_socket);
 	bool	contentEachExtension(const str_ &contents_path, const str_ &extention_look_for);
+	int		x_fcntl(int fd, int cmd, int flg);
+	str_	ft_strlwr(const str_ &str);
+	long	myStrToLL(str_ str);
 }
 
 

@@ -31,7 +31,6 @@ namespace IOM_utils
 	void	setSockaddr_in(int port, struct sockaddr_in *addr);
 	int		x_setsockopt(int serv_socket, int level, int optname);
 	int		x_bind(int serv_socket, struct sockaddr_in addr, socklen_t addr_len);
-	int		x_fcntl(int fd, int cmd, int flg);
 	int		x_listen(int serv_socket, int backlog);
 	int		createListeningSocket(int port);
 	bool	recvRequest(int accepted_socket, char *buffer);

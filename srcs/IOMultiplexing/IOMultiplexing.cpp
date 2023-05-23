@@ -106,7 +106,14 @@ void	IOMultiplexing::sendResponse(int accepted_socket)
 				this->_max_descripotor -= 1;
 		}
 		utils::x_close(accepted_socket);
+
+		debug("---------------------------------------------");
+		debug(accepted_socket);
+		debug(RESPONSE_MESSAGE);
+		debug("---------------------------------------------");
+
 		this->_fd_MessageManagement.erase(accepted_socket);
+		
 	}
 	else if ((size_t)sent_len < RESPONSE_MESSAGE.size())
 	{

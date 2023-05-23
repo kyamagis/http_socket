@@ -3,14 +3,6 @@
 
 namespace cgi_utils
 {
-	void closePutError(int fd)
-	{
-		if (close(fd) == -1)
-		{
-			std::cerr << "close fail" << std::endl;
-		}
-	}
-
 	char *convertStrToCharP(std::string str)
 	{
 		char *str_char;
@@ -83,37 +75,7 @@ namespace cgi_utils
 		return 508;
 	}
 
-	int waitpidAndKill(pid_t pid)
-	{
-		int wstatus;
-		clock_t start_time = getMicroSec();
-
-		if (start_time == CLOCK_FAIL)
-		{
-			return 500;
-		}
-		while (waitpid(pid, &wstatus, WNOHANG) == 0) //中断することなく子プロセスをチェック https://www.ibm.com/docs/ja/zos/2.2.0?topic=functions-waitpid-wait-specific-child-process-end
-		{
-			if (READ_TIME_OUT < getMicroSec() - start_time)
-			{
-				return x_kill(pid);
-			}
-		}
-		if (!WIFEXITED(wstatus))
-		{
-			return 500;
-		}
-		switch (WEXITSTATUS(wstatus))
-		{
-		case EXIT_SUCCESS:
-			return 200;
-		default:
-			return 500;
-		}
-		return (200);
-	}
-
-	clock_t getMicroSec()
+	clock_t getMicroSec(clock_t time_limit)
 	{
 		clock_t t = std::clock(); // 納得していない 定数時間を測るのに適しているとは思えない
 
@@ -121,7 +83,7 @@ namespace cgi_utils
 		{
 			return CLOCK_FAIL;
 		}
-		return (t);
+		return (t + time_limit);
 	}
 
 	void x_dup2(int oldfd, int newfd)
