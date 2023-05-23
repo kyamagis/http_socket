@@ -370,7 +370,7 @@ int	CGI::startCGI()
 		utils::x_close(this->_pipefd_for_send_request_entity_body_to_cgi[READ]);
 		this->cgi_phase = CGI_write;
 	}
-	return 200;
+	return this->cgi_phase;
 }
 
 str_	CGI::getCGIExecResult()

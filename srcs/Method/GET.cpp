@@ -36,17 +36,7 @@ int GET::_startCGI(const str_ &contents_path)
 {
 	this->cgi.setCGI("GET", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
 
-	
-	int status_code = this->cgi.startCGI();
-	if (status_code == 500)
-	{
-		return 500;
-	}
-	else if (status_code == 200)
-	{
-		return this->cgi.cgi_phase; // cgi_phase == CGI_read_header のはず
-	}
-	return 0;
+	return this->cgi.startCGI();
 }
 
 int	GET::endCGI()

@@ -7,37 +7,32 @@ POST::POST(const Request& r) : Method(r)
 
 POST::~POST() {}
 
-#define CONTENT_TYPE this->content_type.getValue()
-#define PIPE_MAX 65536 // pipeに書き込める最大バイト数.これを超えるとブロッキングが発生する
 #define CGI_PATH this->_location.cgi_path.getValue()
 
 /* contents_pathがファイルでもディレクトリでもCGIに渡し実行 */
 /* この場合、どこpathにファイルを生成すべきか */
 
-// int POST::_exeCGI(const str_ &contents_path)
-// {
-// 	if (PIPE_MAX <= this->request_entity_body.size()) // いらないかも
-// 		return 403;
-
-// 	CGI cgi("POST", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
-
-// 	int status_code = cgi.exeCGI();
-// 	if (status_code != 200)
-// 		return status_code;
-// 	size_t last_slash_index = contents_path.rfind('/');
-// 	if (last_slash_index == str_::npos)
-// 	{
-// 		return 500; //適当
-// 	}
-// 	str_ contents_directory_path = contents_path.substr(0, last_slash_index + 1); // ./content/index.html -> ./content/
-// 	str_ file_name = request_utils::createUniqueFileName(contents_directory_path, CONTENT_TYPE);
-// 	status_code = request_utils::makeAndPutFile(cgi.getCGIExecResult(), file_name);
-// 	return status_code;
-// }
-
-int	endCGI()
+int	POST::_startCGI(const str_ &contents_path)
 {
-	
+	this->_last_slash_index = contents_path.rfind('/');
+	if (this->_last_slash_index == str_::npos)
+	{
+		return 500; //適当
+	}
+	this->cgi.setCGI("POST", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
+	this->_contents_path = contents_path;
+	return this->cgi.startCGI();
+}
+
+
+#define CGI_CONTENT_TYPE this->cgi.content_type.getValue()
+
+int	POST::endCGI()
+{
+	/* contents_path で指定されたfileと同じ階層にCGIで作ったfileを置く */
+	str_ contents_directory_path = this->_contents_path.substr(0, this->_last_slash_index + 1); // ./content/index.html -> ./content/
+	str_ file_name = request_utils::createUniqueFileName(contents_directory_path, CGI_CONTENT_TYPE);
+	return request_utils::makeAndPutFile(cgi.getCGIExecResult(), file_name);
 }
 
 int POST::_dealWithIndexAndAutoindex(str_ &contents_path)
@@ -60,6 +55,8 @@ int POST::_dealWithIndexAndAutoindex(str_ &contents_path)
 	return 200;
 }
 
+#define CONTENT_TYPE this->content_type.getValue()
+
 int POST::exeMethod(const Server &server)
 {
 	if (this->content_type.getStatus() == NOT_SET)
@@ -78,7 +75,7 @@ int POST::exeMethod(const Server &server)
 	if (status_code != 200)
 		return status_code;
 	if (this->_location.cgi_path.getStatus() != NOT_SET)
-		return POST::_exeCGI(contents_path);
+		return POST::_startCGI(contents_path);
 	if (request_utils::isAtStrLast(contents_path, "/")) //　contents_path　== ./directory/
 	{
 		str_ file_name = request_utils::createUniqueFileName(contents_path, CONTENT_TYPE);

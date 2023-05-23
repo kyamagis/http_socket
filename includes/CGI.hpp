@@ -41,11 +41,7 @@ class CGI
 		int		_pipefd_for_read_cgi_execution_result[2];
 		int		_pipefd_for_send_request_entity_body_to_cgi[2];
 		str_	_cgi_exec_result;
-		clock_t _time_limit;
-	
-		RValue<str_>			content_type;
-		RValue<unsigned int>	content_length;
-		
+		clock_t _time_limit;	
 
 		void	_x_execve(char **argv);
 		int		_pipeAndFcntl();
@@ -67,7 +63,9 @@ class CGI
 		void	setCGI(str_ method, str_ cgi_path, map_env_ map_env, const str_ &file_path
 			, const str_& request_entity_body);
 
-		enum e_cgi_phase cgi_phase;
+		enum e_cgi_phase		cgi_phase;
+		RValue<str_>			content_type;
+		RValue<unsigned int>	content_length;
 
 		int		startCGI();
 		int		readAndWaitpid();
@@ -75,7 +73,6 @@ class CGI
 		int		writeRequestEntityBodyToCGI();
 		int		getWriteFd();
 		int		getReadFd();
-		//int		manageCGIPhase();
 
 };
 

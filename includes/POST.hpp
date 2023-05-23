@@ -6,8 +6,10 @@
 class POST : public Method
 {
 	private:
-		int	_dealWithIndexAndAutoindex(str_ &contents_path);
-		int	_staertCGI(const str_ &contents_path);
+		str_	_contents_path;
+		size_t	_last_slash_index;
+		int		_dealWithIndexAndAutoindex(str_ &contents_path);
+		int		_startCGI(const str_ &contents_path);
 
 	public:
 		POST(const Request& r);

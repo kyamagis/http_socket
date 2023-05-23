@@ -163,6 +163,11 @@ map_env_	Method::setEnv()
 	return map_env;
 }
 
+int	Method::endCGI()
+{
+	return 0;
+}
+
 Value<str_>	Method::getResponse_entity_body()
 {
 	return this->_response_entity_body;

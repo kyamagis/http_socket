@@ -66,6 +66,7 @@ class IOMultiplexing
 		bool	containsListeningSocket(int fd);
 		void	createAcceptedSocket(int listening_socket);
 		void	storeRequestToMap(int fd);
+		void	writeCGI(int write_fd);
 		bool	isCGIReadFd(int read_fd);
 		bool	isCGIWriteFd(int write_fd);
 		void	storeCGIResponse(int read_fd);

@@ -241,8 +241,12 @@ void	IOMultiplexing::storeCGIResponse(int read_fd)
 	int	fd = accepted_socket; // 無駄無駄無駄無駄
 	t_response_message	response_message;
 	
-	this->_fd_MessageManagement[accepted_socket].readCGIResponse(response_message);
+	if (this->_fd_MessageManagement[accepted_socket].readCGIResponse(response_message) == CONTINUE)
+	{
+		return ;
+	}
 	// CGI の関数でread_fdはclose()した.
+	DEQ_RESPONSE_MESSAGE.push_back(response_message);
 	ATTRIBUTION = NOT_CGI;
 	FD_CLR(read_fd, &this->_master_readfds);
 	IOMultiplexing::decrementMaxDescripotor(read_fd);
@@ -250,6 +254,12 @@ void	IOMultiplexing::storeCGIResponse(int read_fd)
 	INIT_REQUEST_CLASS;
 	delete METHOD_P;
 	METHOD_P = NULL;
+}
+
+void	IOMultiplexing::writeCGI(int write_fd) //　エラーの場合、レスポンスメッセージを書く
+{
+	int	accepted_socket = this->_pipefd_fd[write_fd];
+	int	fd = accepted_socket;
 }
 
 
@@ -280,7 +290,7 @@ void	IOMultiplexing::IOMultiplexingLoop()
 					}
 					else if (IOMultiplexing::isCGIWriteFd(fd));
 					{
-						/* code */
+						IOMultiplexing::writeCGI(fd);
 					}
 					std::cout << "clnt_socket: " << fd << ", max_descripotor: " 
 								<< this->_max_descripotor << std::endl;
