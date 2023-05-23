@@ -7,6 +7,7 @@
 # include	<signal.h>
 # include	"./utils.hpp"
 # include	"./Value.hpp"
+# include	"./Request.hpp"
 # include	"./cgi_utils.hpp"
 
 # define READ 0
@@ -17,46 +18,62 @@ typedef std::map<std::string, std::string>	map_env_;
 enum e_cgi_phase
 {
 	CGI_start,
-	CGT_write,
-	CGI_read
+	CGI_write,
+	CGI_read_header,
+	CGI_read_body,
+	CGI_end
 };
 
 class CGI
 {
 	private:
-		CGI();
 		CGI(const CGI &cgi);
 		CGI &operator=(const CGI &rhs);
 
-		const str_	_method;
-		const str_	_cgi_path;
+		str_		_method;
+		str_		_cgi_path;
 		map_env_	_map_env;
-		const str_	_file_path;
-		const str_	_request_entity_body;
+		str_		_file_path;
+		str_		_request_entity_body;
 		char		**_envp;
 
-		str_		_cgi_exec_result;
-		
+		pid_t	_pid;
 		int		pipefd_for_read_cgi_execution_result[2];
 		int		pipefd_for_send_request_entity_body_to_cgi[2];
+		str_	_cgi_exec_result;
+		clock_t _time_limit;
+	
+		RValue<str_>			content_type;
+		RValue<unsigned int>	content_length;
+		
 
 		void	_x_execve(char **argv);
-		int		_x_pipe();
-		int		_send_request_entity_body_to_cgi(pid_t pid);
-		int		_caseOfPOSTmethod(pid_t pid);
-		int		_readPipefdRead(int readfd);
+		int		_pipeAndFcntl();
+		
+		ssize_t	_readExecResulet();
+		
 		void	_exeExecve();
 		void	_convertMapToEnv(void);
+		int		_parseMime(const str_ &lower_str, const vec_str_ &vec_split_a_header);
+		int		_parseContentType(const vec_str_ &vec_split_a_header);
+		int		_parseContentLength(const vec_str_ &vec_split_header);
+		int		_parseCGIResponseHeaders();
+		int		_parseCGIResponseEntityBody();
+		int		_forkAndClose();
 
 	public:
 
-		CGI(str_ method, str_ cgi_path, map_env_ map_env, const str_ &file_path
+		CGI();
+		void	setCGI(str_ method, str_ cgi_path, map_env_ map_env, const str_ &file_path
 			, const str_& request_entity_body);
 
-		int		exeCGI();
-		str_	getCGIExecResult();
+		enum e_cgi_phase cgi_phase;
 
-		enum e_cgi_phase	manageCGIOperation;
+		int		startCGI();
+		int		readAndWaitpid();
+		str_	getCGIExecResult();
+		int		writeRequestEntityBodyToCGI();
+		//int		manageCGIPhase();
 
 };
 

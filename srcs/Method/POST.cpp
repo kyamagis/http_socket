@@ -14,26 +14,26 @@ POST::~POST() {}
 /* contents_pathがファイルでもディレクトリでもCGIに渡し実行 */
 /* この場合、どこpathにファイルを生成すべきか */
 
-int POST::_exeCGI(const str_ &contents_path)
-{
-	if (PIPE_MAX <= this->request_entity_body.size()) // いらないかも
-		return 403;
+// int POST::_exeCGI(const str_ &contents_path)
+// {
+// 	if (PIPE_MAX <= this->request_entity_body.size()) // いらないかも
+// 		return 403;
 
-	CGI cgi("POST", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
+// 	CGI cgi("POST", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
 
-	int status_code = cgi.exeCGI();
-	if (status_code != 200)
-		return status_code;
-	size_t last_slash_index = contents_path.rfind('/');
-	if (last_slash_index == str_::npos)
-	{
-		return 500; //適当
-	}
-	str_ contents_directory_path = contents_path.substr(0, last_slash_index + 1); // ./content/index.html -> ./content/
-	str_ file_name = request_utils::createUniqueFileName(contents_directory_path, CONTENT_TYPE);
-	status_code = request_utils::makeAndPutFile(cgi.getCGIExecResult(), file_name);
-	return status_code;
-}
+// 	int status_code = cgi.exeCGI();
+// 	if (status_code != 200)
+// 		return status_code;
+// 	size_t last_slash_index = contents_path.rfind('/');
+// 	if (last_slash_index == str_::npos)
+// 	{
+// 		return 500; //適当
+// 	}
+// 	str_ contents_directory_path = contents_path.substr(0, last_slash_index + 1); // ./content/index.html -> ./content/
+// 	str_ file_name = request_utils::createUniqueFileName(contents_directory_path, CONTENT_TYPE);
+// 	status_code = request_utils::makeAndPutFile(cgi.getCGIExecResult(), file_name);
+// 	return status_code;
+// }
 
 int POST::_dealWithIndexAndAutoindex(str_ &contents_path)
 {
@@ -72,8 +72,8 @@ int POST::exeMethod(const Server &server)
 	status_code = POST::_dealWithIndexAndAutoindex(contents_path);
 	if (status_code != 200)
 		return status_code;
-	if (this->_location.cgi_path.getStatus() != NOT_SET)
-		return POST::_exeCGI(contents_path);
+	// if (this->_location.cgi_path.getStatus() != NOT_SET)
+		// return POST::_exeCGI(contents_path);
 	if (request_utils::isAtStrLast(contents_path, "/")) //　contents_path　== ./directory/
 	{
 		str_ file_name = request_utils::createUniqueFileName(contents_path, CONTENT_TYPE);

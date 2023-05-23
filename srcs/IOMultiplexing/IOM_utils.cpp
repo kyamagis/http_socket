@@ -47,17 +47,6 @@ namespace IOM_utils
 		return 0;
 	}
 
-	int	x_fcntl(int fd, int cmd, int flg)
-	{
-		if (fcntl(fd, cmd, flg) == -1)
-		{
-			utils::putError("fcntl() failed");
-			utils::x_close(fd);
-			return -1;
-		}
-		return 0;
-	}
-
 	int	x_listen(int serv_socket, int backlog)
 	{
 		if (listen(serv_socket, backlog) == -1)
@@ -83,7 +72,7 @@ namespace IOM_utils
 		error_flg = x_bind(serv_socket, serv_addr, sizeof(serv_addr));
 		if (error_flg == -1)
 			return -1;
-		error_flg = x_fcntl(serv_socket, F_SETFL, O_NONBLOCK);
+		error_flg = utils::x_fcntl(serv_socket, F_SETFL, O_NONBLOCK);
 		if (error_flg == -1)
 			return -1;
 		error_flg = x_listen(serv_socket, SOMAXCONN);

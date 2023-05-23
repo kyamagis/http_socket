@@ -8,69 +8,6 @@
 
 namespace request_utils
 {
-	str_ ft_strlwr(const str_ &str)
-	{
-		str_ l_str = str;
-
-		for (size_t i = 0; i < l_str.size(); i++)
-		{
-			l_str[i] = std::tolower(l_str[i]);
-		}
-		return l_str;
-	}
-
-	static bool isNumber(int c)
-	{
-		if ('0' <= c && c <= '9')
-		{
-			return true;
-		}
-		return false;
-	}
-
-	static long checkMax(unsigned long num, int flag, size_t digcount)
-	{
-		if (flag == 1 && 10 < digcount)
-		{
-			return -1;
-		}
-		if (flag == 1 && UINT_MAX <= num)
-		{
-			return -1;
-		}
-		if (flag == -1)
-		{
-			return -1;
-		}
-		return (num * flag);
-	}
-
-	long myStrToLL(str_ str)
-	{
-		unsigned long num = 0;
-		size_t i = 0;
-		int flag = 1;
-		size_t digcount = 1;
-
-		if (str[i] == '-')
-		{
-			flag = -1;
-			i++;
-		}
-		while (isNumber(str[i]))
-		{
-			if (num != 0)
-				digcount++;
-			num = 10 * num + (str[i] - '0');
-			i++;
-		}
-		if (str[i] || (!str[i] && i == 0))
-		{
-			return -1;
-		}
-		return (checkMax(num, flag, digcount));
-	}
-
 	static bool isHex(int c)
 	{
 		if (('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F'))
