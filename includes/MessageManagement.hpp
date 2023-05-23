@@ -22,6 +22,7 @@
 #define vec_sever_ std::vector<Server>
 
 class Request;
+class Method;
 
 typedef struct s_response_message
 {
@@ -29,12 +30,23 @@ typedef struct s_response_message
 	str_	response_message;
 }	t_response_message;
 
+enum e_attribution
+{
+	NOT_CGI,
+	DURING_CGI,
+	WRITE_CGI,
+	READ_CGI
+};
+
 class MessageManagement: public Request, public Response 
 {
 	private:
 		
 	public:
+		enum e_attribution attribution;
 		Method	*method_p;
+		int		parent_fd;
+		Server	server;
 		std::deque<t_response_message>	deq_response_message;
 
 		MessageManagement();
@@ -42,10 +54,10 @@ class MessageManagement: public Request, public Response
 		MessageManagement &operator=(const MessageManagement &rhs);
 		~MessageManagement();
 
-		t_response_message	makeResponseMessage(int accepted_socket, const vec_sever_ &servers);
-		Server				searchServerWithMatchingPortAndHost(int accepted_socket, const vec_sever_ &servers);
-		int 				storeMethodToDeq();
-
+		int		makeResponseMessage(t_response_message	&response_message);
+		void	searchServer(int accepted_socket, const vec_sever_ &servers);
+		int 	storeMethodToDeq();
+		int		readCGIResponse(t_response_message &response_message);
 };
 
 std::ostream& operator<<(std::ostream &ostrm, const MessageManagement &tra);

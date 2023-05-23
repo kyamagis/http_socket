@@ -38,8 +38,8 @@ class CGI
 		char		**_envp;
 
 		pid_t	_pid;
-		int		pipefd_for_read_cgi_execution_result[2];
-		int		pipefd_for_send_request_entity_body_to_cgi[2];
+		int		_pipefd_for_read_cgi_execution_result[2];
+		int		_pipefd_for_send_request_entity_body_to_cgi[2];
 		str_	_cgi_exec_result;
 		clock_t _time_limit;
 	
@@ -73,6 +73,8 @@ class CGI
 		int		readAndWaitpid();
 		str_	getCGIExecResult();
 		int		writeRequestEntityBodyToCGI();
+		int		getWriteFd();
+		int		getReadFd();
 		//int		manageCGIPhase();
 
 };

@@ -35,6 +35,11 @@ POST::~POST() {}
 // 	return status_code;
 // }
 
+int	endCGI()
+{
+	
+}
+
 int POST::_dealWithIndexAndAutoindex(str_ &contents_path)
 {
 	if (request_utils::isAtStrLast(this->uri, "/") == false)
@@ -72,8 +77,8 @@ int POST::exeMethod(const Server &server)
 	status_code = POST::_dealWithIndexAndAutoindex(contents_path);
 	if (status_code != 200)
 		return status_code;
-	// if (this->_location.cgi_path.getStatus() != NOT_SET)
-		// return POST::_exeCGI(contents_path);
+	if (this->_location.cgi_path.getStatus() != NOT_SET)
+		return POST::_exeCGI(contents_path);
 	if (request_utils::isAtStrLast(contents_path, "/")) //　contents_path　== ./directory/
 	{
 		str_ file_name = request_utils::createUniqueFileName(contents_path, CONTENT_TYPE);

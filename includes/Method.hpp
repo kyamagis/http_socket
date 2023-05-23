@@ -30,7 +30,7 @@ class Method
 		str_ 		_raw_request;
 
 	public:
-		enum e_phase	response_phase;
+		enum e_request_phase	response_phase;
 
 		str_		response_message;
 
@@ -49,6 +49,8 @@ class Method
 
 		bool	chunked_turn; //次回に来るchunkに期待する物のフラグ
 		size_t	chunked_size; //
+
+		CGI	cgi;
 
 		Method(const Request &r);
 		Method(const Method &rm);
@@ -69,7 +71,7 @@ class Method
 		map_env_		setEnv();
 
 		virtual	int	exeMethod(const Server& server);
-
+		virtual int	endCGI();
 };
 
 #endif

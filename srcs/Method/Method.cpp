@@ -188,3 +188,8 @@ int	Method::exeMethod(const Server& server)
 	(void)server; 
 	return 0;
 }
+
+int	Method::endCGI()
+{
+	return 0;
+}

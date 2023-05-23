@@ -32,17 +32,29 @@ int GET::_readFileContents(const str_ &contents_path)
 
 #define CGI_PATH this->_location.cgi_path.getValue()
 
-// int GET::_exeCGI(const str_ &contents_path)
-// {
-// 	CGI cgi("GET", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
+int GET::_startCGI(const str_ &contents_path)
+{
+	this->cgi.setCGI("GET", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
 
-// 	int status_code = cgi.exeCGI();
-// 	if (status_code != 200)
-// 		return status_code;
-// 	this->_response_entity_body.setValue(cgi.getCGIExecResult());
-// 	this->_response_content_type = "text/plane";
-// 	return status_code;
-// }
+	
+	int status_code = this->cgi.startCGI();
+	if (status_code == 500)
+	{
+		return 500;
+	}
+	else if (status_code == 200)
+	{
+		return this->cgi.cgi_phase; // cgi_phase == CGI_read_header のはず
+	}
+	return 0;
+}
+
+int	GET::endCGI()
+{
+	this->_response_entity_body.setValue(this->cgi.getCGIExecResult());
+	this->_response_content_type = this->content_type.getValue();
+	return 200;
+}
 
 int GET::_exeAutoindex(const str_ &directory_path)
 {
@@ -96,8 +108,8 @@ int GET::_dealWithIndexAndAutoindex(str_ &contents_path)
 
 int GET::exeMethod(const Server &server)
 {
-	int status_code;
-	str_ contents_path;
+	int		status_code;
+	str_	contents_path;
 
 	status_code = Method::handleLocation(server);
 	if (status_code != 200)
@@ -105,13 +117,12 @@ int GET::exeMethod(const Server &server)
 	if (this->_location.method_get.getValue() == false)
 		return 405;
 	contents_path = Method::makeContentsPath(server);
-
 	status_code = GET::_dealWithIndexAndAutoindex(contents_path);	
 	if (status_code != CONTINUE)
 	{
 		return status_code;
 	}
-	// if (this->_location.cgi_path.getStatus() != NOT_SET)
-	// 	return GET::_exeCGI(contents_path);
+	if (this->_location.cgi_path.getStatus() != NOT_SET)
+		return GET::_startCGI(contents_path);
 	return GET::_readFileContents(contents_path);
 }

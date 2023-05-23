@@ -28,7 +28,7 @@ class Request
 		
 	public:
 
-		enum e_phase			request_phase;
+		enum e_request_phase	request_phase;
 
 		int			status_code;
 		str_		request_message;

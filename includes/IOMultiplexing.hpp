@@ -27,7 +27,9 @@
 #define str_ std::string
 #define vec_int_ std::vector<int>
 #define map_fd_MessageManagement_ std::map<int, MessageManagement>
-#define map_ite_ std::map<int, MessageManagement>::iterator
+#define map_fd_MessageManagement_ite:: std::map<int, MessageManagement>::iterator
+#define map_pipefd_fd_ std::map<int, int>
+#define map_pipefd_fd_ite_ std::map<int, int>::iterator
 #define vec_sever_ std::vector<Server>
 
 class MessageManagement;
@@ -51,6 +53,7 @@ class IOMultiplexing
 	
 		struct timeval				_timeout;
 		map_fd_MessageManagement_	_fd_MessageManagement;
+		map_pipefd_fd_				_pipefd_fd;
 
 	public:
 		IOMultiplexing(const vec_sever_	&servers, const vec_int_ &vec_ports);
@@ -62,8 +65,11 @@ class IOMultiplexing
 		void	sendResponse(int clnt_socket);
 		bool	containsListeningSocket(int fd);
 		void	createAcceptedSocket(int listening_socket);
-		void	storeRequestToMap(int accepted);
-
+		void	storeRequestToMap(int fd);
+		bool	isCGIReadFd(int read_fd);
+		bool	isCGIWriteFd(int write_fd);
+		void	storeCGIResponse(int read_fd);
+		void	decrementMaxDescripotor(int fd);
 };
 
 #endif
