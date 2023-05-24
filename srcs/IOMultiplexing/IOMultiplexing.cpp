@@ -173,35 +173,37 @@ void	IOMultiplexing::storeRequestToMap(int fd)
 		return ;
 
 	REQUEST_MESSAGE += buffer;
-	if (PARSE_REQUEST_MESSAGE == END)
+	if (PARSE_REQUEST_MESSAGE == CONTINUE)
 	{
-		t_response_message	response_message;
-	
-		FD_CLR(accepted_socket, &this->_master_readfds);
-		int	cgi_flg = MAKE_RESPONSE_MESSAGE;
-		if (cgi_flg == CGI_write)
-		{
-			ATTRIBUTION = WRITE_CGI;
-			this->_pipefd_fd[WRITE_FD] = accepted_socket;
-			FD_SET(WRITE_FD, &this->_master_writefds);
-		}
-		else if (cgi_flg == CGI_read_body)
-		{
-			ATTRIBUTION = READ_CGI;
-			this->_pipefd_fd[READ_FD] = accepted_socket;
-			FD_SET(READ_FD, &this->_master_readfds);
-			if (this->_max_descripotor < READ_FD)
-				this->_max_descripotor = READ_FD;
-		}
-		else
-		{
-			FD_SET(accepted_socket, &this->_master_writefds);
-			DEQ_RESPONSE_MESSAGE.push_back(response_message);
-			debug(this->_fd_MessageManagement[accepted_socket]);
-			INIT_REQUEST_CLASS;
-			delete METHOD_P;
-			METHOD_P = NULL;
-		}
+		return ;
+	}
+
+	t_response_message	response_message;
+
+	FD_CLR(accepted_socket, &this->_master_readfds);
+	int	cgi_flg = MAKE_RESPONSE_MESSAGE;
+	if (cgi_flg == CGI_write)
+	{
+		ATTRIBUTION = WRITE_CGI;
+		this->_pipefd_fd[WRITE_FD] = accepted_socket;
+		FD_SET(WRITE_FD, &this->_master_writefds);
+	}
+	else if (cgi_flg == CGI_read_body)
+	{
+		ATTRIBUTION = READ_CGI;
+		this->_pipefd_fd[READ_FD] = accepted_socket;
+		FD_SET(READ_FD, &this->_master_readfds);
+		if (this->_max_descripotor < READ_FD)
+			this->_max_descripotor = READ_FD;
+	}
+	else
+	{
+		FD_SET(accepted_socket, &this->_master_writefds);
+		DEQ_RESPONSE_MESSAGE.push_back(response_message);
+		debug(this->_fd_MessageManagement[accepted_socket]);
+		INIT_REQUEST_CLASS;
+		delete METHOD_P;
+		METHOD_P = NULL;
 	}
 }
 
