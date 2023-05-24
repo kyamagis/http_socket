@@ -158,11 +158,11 @@ int		MessageManagement::readCGIResponse(t_response_message &response_message)
 		response_message.response_message = Response::errorResponseMessage(500, this->server);
 		return END;
 	}
-	if (status == 200 || status == CONTINUE)
+	else if (status == 200 || status == CONTINUE)
 	{
 		return CONTINUE;
 	}
-	if (status == END)
+	else // (status == END)
 	{
 		this->method_p->endCGI();
 		if (this->method_p->connection.getValue() == CONNECTION_KEEP_ALIVE)
@@ -172,6 +172,25 @@ int		MessageManagement::readCGIResponse(t_response_message &response_message)
 																	 this->method_p->getContentType(),
 																	 this->method_p->connection,
 																	this->server);
+		return END;
+	}
+}
+
+int		MessageManagement::writeCGIRequest(t_response_message &response_message)
+{
+	int	status = this->method_p->cgi.writeRequestEntityBodyToCGI();
+
+	if (status == 500)
+	{
+		response_message.response_message = Response::errorResponseMessage(500, this->server);
+		return 500;
+	}
+	else if (status == CONTINUE)
+	{
+		return CONTINUE;
+	}
+	else// (status == END)
+	{
 		return END;
 	}
 }

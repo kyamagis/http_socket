@@ -27,7 +27,7 @@
 #define str_ std::string
 #define vec_int_ std::vector<int>
 #define map_fd_MessageManagement_ std::map<int, MessageManagement>
-#define map_fd_MessageManagement_ite:: std::map<int, MessageManagement>::iterator
+#define map_fd_MessageManagement_ite_ std::map<int, MessageManagement>::iterator
 #define map_pipefd_fd_ std::map<int, int>
 #define map_pipefd_fd_ite_ std::map<int, int>::iterator
 #define vec_sever_ std::vector<Server>

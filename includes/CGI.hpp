@@ -6,6 +6,7 @@
 # include	<unistd.h>
 # include	<signal.h>
 # include	"./utils.hpp"
+# include	"./RValue.hpp"
 # include	"./Value.hpp"
 # include	"./Request.hpp"
 # include	"./cgi_utils.hpp"
@@ -60,6 +61,7 @@ class CGI
 	public:
 
 		CGI();
+		~CGI();
 		void	setCGI(str_ method, str_ cgi_path, map_env_ map_env, const str_ &file_path
 			, const str_& request_entity_body);
 

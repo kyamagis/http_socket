@@ -260,6 +260,29 @@ void	IOMultiplexing::writeCGI(int write_fd) //　エラーの場合、レスポ�
 {
 	int	accepted_socket = this->_pipefd_fd[write_fd];
 	int	fd = accepted_socket;
+	t_response_message	response_message;
+	int	status = this->_fd_MessageManagement[accepted_socket].writeCGIRequest(response_message);
+
+	if (status == CONTINUE)
+	{
+		return ;
+	}
+	FD_CLR(write_fd, &this->_master_writefds);
+	IOMultiplexing::decrementMaxDescripotor(write_fd);
+	if (status == 500)
+	{
+		FD_SET(accepted_socket, &this->_master_writefds);
+		DEQ_RESPONSE_MESSAGE.push_back(response_message);
+		ATTRIBUTION = NOT_CGI;
+		INIT_REQUEST_CLASS;
+		delete METHOD_P;
+		METHOD_P = NULL;
+	}
+	else if (status == END)
+	{
+		FD_SET(READ_FD, &this->_master_readfds);
+		ATTRIBUTION = READ_CGI;
+	}
 }
 
 
@@ -288,7 +311,7 @@ void	IOMultiplexing::IOMultiplexingLoop()
 					{
 						IOMultiplexing::sendResponse(fd);
 					}
-					else if (IOMultiplexing::isCGIWriteFd(fd));
+					else if (IOMultiplexing::isCGIWriteFd(fd))
 					{
 						IOMultiplexing::writeCGI(fd);
 					}

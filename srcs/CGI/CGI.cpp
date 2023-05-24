@@ -16,6 +16,11 @@ CGI &CGI::operator=(const CGI &rhs)
 	return *this;
 }
 
+CGI::~CGI()
+{
+
+}
+
 void CGI::_convertMapToEnv(void)
 {
 	size_t size = this->_map_env.size();

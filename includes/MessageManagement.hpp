@@ -58,6 +58,7 @@ class MessageManagement: public Request, public Response
 		void	searchServer(int accepted_socket, const vec_sever_ &servers);
 		int 	storeMethodToDeq();
 		int		readCGIResponse(t_response_message &response_message);
+		int		writeCGIRequest(t_response_message &response_message);
 };
 
 std::ostream& operator<<(std::ostream &ostrm, const MessageManagement &tra);

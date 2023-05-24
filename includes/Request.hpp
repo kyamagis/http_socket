@@ -10,7 +10,6 @@
 
 #include "./utils.hpp"
 #include "./request_utils.hpp"
-#include "./Method.hpp"
 #include "./RValue.hpp"
 
 #define CONNECTION_CLOSE 0
