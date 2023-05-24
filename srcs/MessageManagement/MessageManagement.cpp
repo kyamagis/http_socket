@@ -1,20 +1,20 @@
-#include "../includes/MessageManagement.hpp"
+#include "../../includes/MessageManagement.hpp"
 
 #define REQUEST_PHASE this->_fd_MessageManagement[accepted_socket].request_phase
 #define REQUEST_PARSE_LINE_AND_HEADERS this->_fd_MessageManagement[accepted_socket].parseRequestLineAndHeaders(entity_body_pos)
 #define REQUEST_INIT_CLASS this->_fd_MessageManagement[accepted_socket].initResponseClass()
 #define REQUEST_PARSE_ENTITY_BODY this->_fd_MessageManagement[accepted_socket].parseRequestEntityBody()
 
-MessageManagement::MessageManagement(): Request(), method_p(NULL)
+MessageManagement::MessageManagement(): Request(), attribution(NOT_CGI), method_p(NULL), parent_fd(0)
 {
 	
 }
 	
 MessageManagement::~MessageManagement()
 {
-	if (method_p != NULL)
+	if (this->method_p != NULL)
 	{
-		delete method_p;
+		delete this->method_p;
 	}
 }
 
@@ -27,9 +27,12 @@ MessageManagement &MessageManagement::operator=(const MessageManagement &rhs)
 {
 	if (this != &rhs)
 	{
-		this->request_phase        = rhs.request_phase;
-		this->request_message      = rhs.request_message;
-		this->method_p = rhs.method_p;
+		this->attribution     = rhs.attribution;
+		this->method_p = rhs.method_p; // new したほうがいい気がするが
+		this->parent_fd       = rhs.parent_fd;
+		this->request_phase   = rhs.request_phase;
+		this->request_message = rhs.request_message;
+		
 	}
 	return *this;
 }
@@ -55,23 +58,30 @@ uint16_t	getPortFromAcceptedSocket(int accepted_socket)
 	ポート番号が一致するベクターの最後のサーバーを返す.
 */
 
-Server	MessageManagement::searchServerWithMatchingPortAndHost(int accepted_socket, const vec_sever_ &servers)
+void	MessageManagement::searchServer(int accepted_socket, const vec_sever_ &servers)
 {
 	uint16_t	accepted_socket_port = getPortFromAcceptedSocket(accepted_socket);
 	size_t		maching_server_idx = 0;
+	bool		first_flg = false;
 
 	for (size_t i = 0; i < servers.size(); i++)
 	{
 		if (accepted_socket_port == servers[i].listen_port.getValue())
 		{
-			maching_server_idx = i;
+			if (first_flg == false)
+			{
+				maching_server_idx = i;
+				first_flg = true;
+			}
 			if (this->host.getValue()== servers[i].listen_host.getValue())
 			{
-				return servers[i];
+				this->server = servers[i];
+				return ;
 			}
 		}
 	}
-	return servers[maching_server_idx];
+	this->server = servers[maching_server_idx];
+	return ;
 }
 
 int MessageManagement::storeMethodToDeq()
@@ -101,32 +111,34 @@ int MessageManagement::storeMethodToDeq()
 }
 
 
-t_response_message	MessageManagement::makeResponseMessage(int accepted_socket, const vec_sever_ &servers)
+int	MessageManagement::makeResponseMessage(t_response_message &response_message)
 {
 	// sigchildを無視することで、子プロセスの終了を親プロセスが待たないようにする。<= やる意味がわからない
 	// これを実行すると、waitpid()からexecve()の失敗を検知できない。それでもいいのか？
 	// signal(SIGCHLD, SIG_IGN);
-	t_response_message	response_message;
 
 	response_message.connection_flg = CONNECTION_CLOSE;
 
-	Server	server = MessageManagement::searchServerWithMatchingPortAndHost(accepted_socket, servers);
 	int		local_status_code = MessageManagement::storeMethodToDeq();
 
 	if (local_status_code == 200)
 	{
-		local_status_code = this->method_p->exeMethod(server);
+		local_status_code = this->method_p->exeMethod(this->server);
+		if (local_status_code == CGI_write || local_status_code == CGI_read_body)
+		{
+			return local_status_code;
+		}
 	}
 	if (local_status_code == 301)
 	{
 		response_message.response_message = Response::redirectionResponseMessage(this->method_p->getResponse_redirect_uri(),
-													server);
-		return response_message;
+													this->server);
+		return 200;
 	}
 	if (local_status_code != 200)
 	{
-		response_message.response_message = Response::errorResponseMessage(local_status_code, server);
-		return response_message;
+		response_message.response_message = Response::errorResponseMessage(local_status_code, this->server);
+		return 200;
 	}
 	if (this->method_p->connection.getValue() == CONNECTION_KEEP_ALIVE)
 		response_message.connection_flg = CONNECTION_KEEP_ALIVE;
@@ -134,8 +146,53 @@ t_response_message	MessageManagement::makeResponseMessage(int accepted_socket, c
 																	this->method_p->getResponse_entity_body(),
 																	 this->method_p->getContentType(),
 																	 this->method_p->connection,
-																	server);
-	return response_message;
+																	this->server);
+	return 200;
+}
+
+int		MessageManagement::readCGIResponse(t_response_message &response_message)
+{
+	int status = this->method_p->cgi.readAndWaitpid();
+	if (status == 500)
+	{
+		response_message.response_message = Response::errorResponseMessage(500, this->server);
+		return END;
+	}
+	else if (status == 200 || status == CONTINUE)
+	{
+		return CONTINUE;
+	}
+	else // (status == END)
+	{
+		this->method_p->endCGI();
+		if (this->method_p->connection.getValue() == CONNECTION_KEEP_ALIVE)
+			response_message.connection_flg = CONNECTION_KEEP_ALIVE;
+		response_message.response_message = Response::okResponseMessage(200,
+																	this->method_p->getResponse_entity_body(),
+																	 this->method_p->getContentType(),
+																	 this->method_p->connection,
+																	this->server);
+		return END;
+	}
+}
+
+int		MessageManagement::writeCGIRequest(t_response_message &response_message)
+{
+	int	status = this->method_p->cgi.writeRequestEntityBodyToCGI();
+
+	if (status == 500)
+	{
+		response_message.response_message = Response::errorResponseMessage(500, this->server);
+		return 500;
+	}
+	else if (status == CONTINUE)
+	{
+		return CONTINUE;
+	}
+	else// (status == END)
+	{
+		return END;
+	}
 }
 
 

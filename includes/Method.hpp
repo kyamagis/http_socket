@@ -10,11 +10,13 @@
 #include "./utils.hpp"
 #include "./RValue.hpp"
 #include "./Request.hpp"
-#include "./Config.hpp"
+
+#include "./Server.hpp"
 #include "./CGI.hpp"
 
 typedef std::map<std::string, std::string>	map_env_;
 
+class CGI;
 class Request;
 
 class Method
@@ -27,10 +29,10 @@ class Method
 		Value<str_>	_response_redirect_uri;
 		Value<str_>	_response_entity_body;
 		str_		_response_content_type;
-		str_ 		_raw_request;
+		str_		_raw_request;
 
 	public:
-		enum e_phase	response_phase;
+		enum e_request_phase	response_phase;
 
 		str_		response_message;
 
@@ -49,6 +51,8 @@ class Method
 
 		bool	chunked_turn; //次回に来るchunkに期待する物のフラグ
 		size_t	chunked_size; //
+
+		CGI	cgi;
 
 		Method(const Request &r);
 		Method(const Method &rm);
@@ -69,7 +73,7 @@ class Method
 		map_env_		setEnv();
 
 		virtual	int	exeMethod(const Server& server);
-
+		virtual	int	endCGI();
 };
 
 #endif

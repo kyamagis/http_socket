@@ -1,4 +1,4 @@
-#include	"Server.hpp"
+#include	"../../includes/Server.hpp"
 
 Server::Server() : listen_host("127.0.0.1"), listen_port(80), root("./contents/"), client_max_body_size(1000000)
 {

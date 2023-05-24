@@ -3,11 +3,16 @@
 #define BUFF_SIZE 10240
 #define DEQ_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message
 #define RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message[0].response_message
-#define MAKE_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].makeResponseMessage(accepted_socket, this->_servers)
+#define MAKE_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].makeResponseMessage(response_message)
 #define METHOD_P this->_fd_MessageManagement[accepted_socket].method_p
 #define REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].request_message
 #define PARSE_REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].parseRequstMessage()
 #define INIT_REQUEST_CLASS this->_fd_MessageManagement[accepted_socket].initResponseClass()
+#define ATTRIBUTION this->_fd_MessageManagement[fd].attribution
+
+#define WRITE_FD this->_fd_MessageManagement[accepted_socket].method_p->cgi.getWriteFd()
+#define READ_FD this->_fd_MessageManagement[accepted_socket].method_p->cgi.getReadFd()
+
 
 
 IOMultiplexing::IOMultiplexing()
@@ -80,7 +85,15 @@ void IOMultiplexing::initMasterReadfds()
 	}
 }
 
-
+void	IOMultiplexing::decrementMaxDescripotor(int fd)
+{
+	if (fd == this->_max_descripotor)
+	{	
+		while (!FD_ISSET(this->_max_descripotor, &this->_master_readfds) && \
+				!FD_ISSET(this->_max_descripotor, &this->_master_writefds))
+			this->_max_descripotor -= 1;
+	}
+}
 
 void	IOMultiplexing::sendResponse(int accepted_socket)
 {
@@ -99,12 +112,7 @@ void	IOMultiplexing::sendResponse(int accepted_socket)
 	if (sent_len < 1 || RESPONSE_MESSAGE.size() == (size_t)sent_len)
 	{
 		FD_CLR(accepted_socket, &this->_master_writefds);
-		if (accepted_socket == this->_max_descripotor)
-		{	
-			while (!FD_ISSET(this->_max_descripotor, &this->_master_readfds) && \
-					!FD_ISSET(this->_max_descripotor, &this->_master_writefds))
-				this->_max_descripotor -= 1;
-		}
+		IOMultiplexing::decrementMaxDescripotor(accepted_socket);
 		utils::x_close(accepted_socket);
 
 		debug("---------------------------------------------");
@@ -148,6 +156,7 @@ void	IOMultiplexing::createAcceptedSocket(int listening_socket)
 			return ;
 		}
 		this->_fd_MessageManagement.insert(std::pair<int, MessageManagement>(accepted_socket, MessageManagement()));
+		this->_fd_MessageManagement[accepted_socket].MessageManagement::searchServer(accepted_socket, this->_servers);
 		FD_SET(accepted_socket, &this->_master_readfds);
 		if (this->_max_descripotor < accepted_socket)
 			this->_max_descripotor = accepted_socket;
@@ -155,9 +164,10 @@ void	IOMultiplexing::createAcceptedSocket(int listening_socket)
 }
 
 /* 基底回数以上になったら、閉じる動作を入れる */
-void	IOMultiplexing::storeRequestToMap(int accepted_socket)
+void	IOMultiplexing::storeRequestToMap(int fd)
 {
 	char	buffer[BUFF_SIZE + 1];
+	int		accepted_socket = fd; // わかりやすくするために代入した.技術的な意味はない
 
 	if (!IOM_utils::recvRequest(accepted_socket, buffer))
 		return ;
@@ -165,15 +175,116 @@ void	IOMultiplexing::storeRequestToMap(int accepted_socket)
 	REQUEST_MESSAGE += buffer;
 	if (PARSE_REQUEST_MESSAGE == END)
 	{
+		t_response_message	response_message;
+	
 		FD_CLR(accepted_socket, &this->_master_readfds);
+		int	cgi_flg = MAKE_RESPONSE_MESSAGE;
+		if (cgi_flg == CGI_write)
+		{
+			ATTRIBUTION = WRITE_CGI;
+			this->_pipefd_fd[WRITE_FD] = accepted_socket;
+			FD_SET(WRITE_FD, &this->_master_writefds);
+		}
+		else if (cgi_flg == CGI_read_body)
+		{
+			ATTRIBUTION = READ_CGI;
+			this->_pipefd_fd[READ_FD] = accepted_socket;
+			FD_SET(READ_FD, &this->_master_readfds);
+			if (this->_max_descripotor < READ_FD)
+				this->_max_descripotor = READ_FD;
+		}
+		else
+		{
+			FD_SET(accepted_socket, &this->_master_writefds);
+			DEQ_RESPONSE_MESSAGE.push_back(response_message);
+			debug(this->_fd_MessageManagement[accepted_socket]);
+			INIT_REQUEST_CLASS;
+			delete METHOD_P;
+			METHOD_P = NULL;
+		}
+	}
+}
+
+bool	IOMultiplexing::isCGIWriteFd(int write_fd)
+{
+	map_pipefd_fd_ite_	ite = this->_pipefd_fd.find(write_fd);
+
+	if (ite == this->_pipefd_fd.end())
+	{
+		return false;
+	}
+	if (this->_fd_MessageManagement[ite->second].attribution != WRITE_CGI)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool	IOMultiplexing::isCGIReadFd(int read_fd)
+{
+	map_pipefd_fd_ite_	ite = this->_pipefd_fd.find(read_fd);
+
+	if (ite == this->_pipefd_fd.end())
+	{
+		return false;
+	}
+	if (this->_fd_MessageManagement[ite->second].attribution != READ_CGI)
+	{
+		return false;
+	}
+	return true;
+}
+
+void	IOMultiplexing::storeCGIResponse(int read_fd)
+{
+	int	accepted_socket = this->_pipefd_fd[read_fd];
+	int	fd = accepted_socket; // 無駄無駄無駄無駄
+	t_response_message	response_message;
+	
+	if (this->_fd_MessageManagement[accepted_socket].readCGIResponse(response_message) == CONTINUE)
+	{
+		return ;
+	}
+	// CGI の関数でread_fdはclose()した.
+	DEQ_RESPONSE_MESSAGE.push_back(response_message);
+	ATTRIBUTION = NOT_CGI;
+	FD_CLR(read_fd, &this->_master_readfds);
+	IOMultiplexing::decrementMaxDescripotor(read_fd);
+	FD_SET(accepted_socket, &this->_master_writefds);
+	INIT_REQUEST_CLASS;
+	delete METHOD_P;
+	METHOD_P = NULL;
+}
+
+void	IOMultiplexing::writeCGI(int write_fd) //　エラーの場合、レスポンスメッセージを書く
+{
+	int	accepted_socket = this->_pipefd_fd[write_fd];
+	int	fd = accepted_socket;
+	t_response_message	response_message;
+	int	status = this->_fd_MessageManagement[accepted_socket].writeCGIRequest(response_message);
+
+	if (status == CONTINUE)
+	{
+		return ;
+	}
+	FD_CLR(write_fd, &this->_master_writefds);
+	IOMultiplexing::decrementMaxDescripotor(write_fd);
+	if (status == 500)
+	{
 		FD_SET(accepted_socket, &this->_master_writefds);
-		DEQ_RESPONSE_MESSAGE.push_back(MAKE_RESPONSE_MESSAGE);
-		debug(this->_fd_MessageManagement[accepted_socket]);
+		DEQ_RESPONSE_MESSAGE.push_back(response_message);
+		ATTRIBUTION = NOT_CGI;
 		INIT_REQUEST_CLASS;
 		delete METHOD_P;
 		METHOD_P = NULL;
 	}
+	else if (status == END)
+	{
+		FD_SET(READ_FD, &this->_master_readfds);
+		ATTRIBUTION = READ_CGI;
+	}
 }
+
 
 void	IOMultiplexing::IOMultiplexingLoop()
 {
@@ -196,8 +307,15 @@ void	IOMultiplexing::IOMultiplexingLoop()
 			{
 				if (FD_ISSET(fd, &this->_writefds))
 				{
-					IOMultiplexing::sendResponse(fd);
-					std::cout << "clnt_socket: " <<  fd << ", max_descripotor: " 
+					if (ATTRIBUTION == NOT_CGI)
+					{
+						IOMultiplexing::sendResponse(fd);
+					}
+					else if (IOMultiplexing::isCGIWriteFd(fd))
+					{
+						IOMultiplexing::writeCGI(fd);
+					}
+					std::cout << "clnt_socket: " << fd << ", max_descripotor: " 
 								<< this->_max_descripotor << std::endl;
 				}
 				else if (FD_ISSET(fd, &this->_readfds))
@@ -206,10 +324,15 @@ void	IOMultiplexing::IOMultiplexingLoop()
 					{
 						IOMultiplexing::createAcceptedSocket(fd);
 					}
-					else
+					else if (ATTRIBUTION == NOT_CGI)
 					{
 						IOMultiplexing::storeRequestToMap(fd);
 					}
+					else if (IOMultiplexing::isCGIReadFd(fd))
+					{
+						IOMultiplexing::storeCGIResponse(fd);
+					}
+					
 				}
 			}
 		}

@@ -10,7 +10,6 @@
 
 #include "./utils.hpp"
 #include "./request_utils.hpp"
-#include "./Method.hpp"
 #include "./RValue.hpp"
 
 #define CONNECTION_CLOSE 0
@@ -28,7 +27,7 @@ class Request
 		
 	public:
 
-		enum e_phase			request_phase;
+		enum e_request_phase	request_phase;
 
 		int			status_code;
 		str_		request_message;
@@ -37,7 +36,7 @@ class Request
 		str_ 		version;
 
 		RValue<str_>	host;
-		int			port;
+		int				port;
 
 		RValue<str_>			content_type;
 		RValue<unsigned int>	content_length;

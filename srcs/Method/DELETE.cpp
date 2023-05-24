@@ -6,6 +6,11 @@ DELETE::DELETE(const Request& r) : Method(r)
 
 DELETE::~DELETE() {}
 
+int	DELETE::endCGI()
+{
+	return 0;
+}
+
 int	DELETE::_joinIndex(str_ &contents_path)
 {
 	if(Method::joinIndex(contents_path) == 200)

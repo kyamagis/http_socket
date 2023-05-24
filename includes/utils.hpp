@@ -39,13 +39,11 @@ typedef	std::map<int, str_> map_status_ ;
 typedef	std::map<int, str_> map_wday_ ;
 typedef	std::map<int, str_> map_month_ ;
 
-enum e_phase
+enum e_request_phase
 {
 	RECV_REQUEST,
 	RECV_ENTITY_BODY,
-	SEND_RESPONSE,
-	CGI_PHASE,
-	CLOSE_ACCEPTED_SOCKET
+	SEND_RESPONSE
 };
 
 namespace utils

@@ -6,6 +6,7 @@
 # include	<unistd.h>
 # include	<signal.h>
 # include	"./utils.hpp"
+# include	"./RValue.hpp"
 # include	"./Value.hpp"
 # include	"./Request.hpp"
 # include	"./cgi_utils.hpp"
@@ -38,14 +39,10 @@ class CGI
 		char		**_envp;
 
 		pid_t	_pid;
-		int		pipefd_for_read_cgi_execution_result[2];
-		int		pipefd_for_send_request_entity_body_to_cgi[2];
+		int		_pipefd_for_read_cgi_execution_result[2];
+		int		_pipefd_for_send_request_entity_body_to_cgi[2];
 		str_	_cgi_exec_result;
-		clock_t _time_limit;
-	
-		RValue<str_>			content_type;
-		RValue<unsigned int>	content_length;
-		
+		clock_t _time_limit;	
 
 		void	_x_execve(char **argv);
 		int		_pipeAndFcntl();
@@ -64,16 +61,20 @@ class CGI
 	public:
 
 		CGI();
+		~CGI();
 		void	setCGI(str_ method, str_ cgi_path, map_env_ map_env, const str_ &file_path
 			, const str_& request_entity_body);
 
-		enum e_cgi_phase cgi_phase;
+		enum e_cgi_phase		cgi_phase;
+		RValue<str_>			content_type;
+		RValue<unsigned int>	content_length;
 
 		int		startCGI();
 		int		readAndWaitpid();
 		str_	getCGIExecResult();
 		int		writeRequestEntityBodyToCGI();
-		//int		manageCGIPhase();
+		int		getWriteFd();
+		int		getReadFd();
 
 };
 

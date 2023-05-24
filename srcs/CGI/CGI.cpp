@@ -16,6 +16,11 @@ CGI &CGI::operator=(const CGI &rhs)
 	return *this;
 }
 
+CGI::~CGI()
+{
+
+}
+
 void CGI::_convertMapToEnv(void)
 {
 	size_t size = this->_map_env.size();
@@ -49,13 +54,13 @@ void	CGI::_exeExecve()
 	char **argv = cgi_utils::makeCharDoublePointer(command_line_options);
 	if (_method == "POST")
 	{
-		utils::x_close(this->pipefd_for_send_request_entity_body_to_cgi[WRITE]);
-		cgi_utils::x_dup2(this->pipefd_for_send_request_entity_body_to_cgi[READ], STDIN_FILENO);
-		utils::x_close(this->pipefd_for_send_request_entity_body_to_cgi[READ]);
+		utils::x_close(this->_pipefd_for_send_request_entity_body_to_cgi[WRITE]);
+		cgi_utils::x_dup2(this->_pipefd_for_send_request_entity_body_to_cgi[READ], STDIN_FILENO);
+		utils::x_close(this->_pipefd_for_send_request_entity_body_to_cgi[READ]);
 	}
-	utils::x_close(this->pipefd_for_read_cgi_execution_result[READ]);
-	cgi_utils::x_dup2(this->pipefd_for_read_cgi_execution_result[WRITE], STDOUT_FILENO);
-	utils::x_close(this->pipefd_for_read_cgi_execution_result[WRITE]);
+	utils::x_close(this->_pipefd_for_read_cgi_execution_result[READ]);
+	cgi_utils::x_dup2(this->_pipefd_for_read_cgi_execution_result[WRITE], STDOUT_FILENO);
+	utils::x_close(this->_pipefd_for_read_cgi_execution_result[WRITE]);
 	CGI::_convertMapToEnv();
 	CGI::_x_execve(argv);
 }
@@ -174,7 +179,7 @@ int	CGI::_parseCGIResponseHeaders()
 ssize_t	CGI::_readExecResulet()
 {
 	char	buff[READ_LEN + 1];
-	int		readfd = this->pipefd_for_read_cgi_execution_result[READ];
+	int		readfd = this->_pipefd_for_read_cgi_execution_result[READ];
 
 	ssize_t	read_len = read(readfd, buff, READ_LEN);
 	if (read_len == -1)
@@ -206,7 +211,7 @@ int	CGI::_parseCGIResponseEntityBody()
 
 int CGI::readAndWaitpid()
 {
-	int		readfd = this->pipefd_for_read_cgi_execution_result[READ];
+	int		readfd = this->_pipefd_for_read_cgi_execution_result[READ];
 	clock_t	start_time = cgi_utils::getMicroSec(0);
 	int		status_code = 0;
 
@@ -269,28 +274,28 @@ int CGI::readAndWaitpid()
 
 int CGI::_pipeAndFcntl()
 {
-	if (pipe(this->pipefd_for_read_cgi_execution_result) == -1)
+	if (pipe(this->_pipefd_for_read_cgi_execution_result) == -1)
 	{
 		return -1;
 	}
-	if (utils::x_fcntl(this->pipefd_for_read_cgi_execution_result[READ], F_SETFL, O_NONBLOCK) == -1)
+	if (utils::x_fcntl(this->_pipefd_for_read_cgi_execution_result[READ], F_SETFL, O_NONBLOCK) == -1)
 	{
-		utils::x_close(this->pipefd_for_read_cgi_execution_result[WRITE]);
+		utils::x_close(this->_pipefd_for_read_cgi_execution_result[WRITE]);
 		return -1;
 	}
 	if (_method != "POST")
 	{
 		return 0;
 	}
-	if (pipe(this->pipefd_for_send_request_entity_body_to_cgi) == -1)
+	if (pipe(this->_pipefd_for_send_request_entity_body_to_cgi) == -1)
 	{
-		utils::x_close(this->pipefd_for_read_cgi_execution_result[WRITE]);
-		utils::x_close(this->pipefd_for_read_cgi_execution_result[READ]);
+		utils::x_close(this->_pipefd_for_read_cgi_execution_result[WRITE]);
+		utils::x_close(this->_pipefd_for_read_cgi_execution_result[READ]);
 		return -1;
 	}
-	if (utils::x_fcntl(this->pipefd_for_read_cgi_execution_result[READ], F_SETFL, O_NONBLOCK) == -1)
+	if (utils::x_fcntl(this->_pipefd_for_read_cgi_execution_result[READ], F_SETFL, O_NONBLOCK) == -1)
 	{
-		utils::x_close(this->pipefd_for_read_cgi_execution_result[WRITE]);
+		utils::x_close(this->_pipefd_for_read_cgi_execution_result[WRITE]);
 		return -1;
 	}
 	return 0;
@@ -300,7 +305,7 @@ int CGI::_pipeAndFcntl()
 
 int CGI::writeRequestEntityBodyToCGI()
 {
-	int	writefd = this->pipefd_for_send_request_entity_body_to_cgi[WRITE];
+	int	writefd = this->_pipefd_for_send_request_entity_body_to_cgi[WRITE];
 
 	clock_t	start_time = cgi_utils::getMicroSec(0);
 	if (this->_request_entity_body.size() == 0)
@@ -314,7 +319,7 @@ int CGI::writeRequestEntityBodyToCGI()
 	if (wrote_len < 1 || this->_time_limit < end_time - start_time)
 	{
 		utils::x_close(writefd);
-		utils::x_close(this->pipefd_for_read_cgi_execution_result[READ]);
+		utils::x_close(this->_pipefd_for_read_cgi_execution_result[READ]);
 		cgi_utils::x_kill(this->_pid);
 		return 500;
 	}
@@ -334,12 +339,12 @@ int	CGI::_forkAndClose()
 	this->_pid = fork();
 	if (this->_pid == -1)
 	{
-		utils::x_close(this->pipefd_for_read_cgi_execution_result[WRITE]);
-		utils::x_close(this->pipefd_for_read_cgi_execution_result[READ]);
+		utils::x_close(this->_pipefd_for_read_cgi_execution_result[WRITE]);
+		utils::x_close(this->_pipefd_for_read_cgi_execution_result[READ]);
 		if (this->_method == "POST")
 		{
-			utils::x_close(this->pipefd_for_send_request_entity_body_to_cgi[WRITE]);
-			utils::x_close(this->pipefd_for_send_request_entity_body_to_cgi[READ]);
+			utils::x_close(this->_pipefd_for_send_request_entity_body_to_cgi[WRITE]);
+			utils::x_close(this->_pipefd_for_send_request_entity_body_to_cgi[READ]);
 		}
 		return -1;
 	}
@@ -360,17 +365,17 @@ int	CGI::startCGI()
 	{
 		CGI::_exeExecve();
 	}
-	utils::x_close(this->pipefd_for_read_cgi_execution_result[WRITE]);
+	utils::x_close(this->_pipefd_for_read_cgi_execution_result[WRITE]);
 	if (this->_method == "GET")
 	{
 		this->cgi_phase = CGI_read_header;
 	}
 	else if (_method == "POST")
 	{
-		utils::x_close(this->pipefd_for_send_request_entity_body_to_cgi[READ]);
+		utils::x_close(this->_pipefd_for_send_request_entity_body_to_cgi[READ]);
 		this->cgi_phase = CGI_write;
 	}
-	return 200;
+	return this->cgi_phase;
 }
 
 str_	CGI::getCGIExecResult()
@@ -389,6 +394,16 @@ void	CGI::setCGI(str_ method, str_ cgi_path, map_env_ map_env,
 	this->_request_entity_body = request_entity_body;
 	this->_envp = NULL;
 	this->_time_limit = TIME_LIMIT;
+}
+
+int		CGI::getWriteFd()
+{
+	return this->_pipefd_for_send_request_entity_body_to_cgi[WRITE];
+}
+
+int		CGI::getReadFd()
+{
+	return this->_pipefd_for_read_cgi_execution_result[READ];
 }
 
 
