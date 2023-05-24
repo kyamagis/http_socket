@@ -36,7 +36,7 @@ class Request
 		str_ 		version;
 
 		RValue<str_>	host;
-		int			port;
+		int				port;
 
 		RValue<str_>			content_type;
 		RValue<unsigned int>	content_length;
