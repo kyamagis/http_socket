@@ -93,7 +93,7 @@ namespace IOM_utils
 		{
 			if (errno != EWOULDBLOCK)
 			{
-				utils::exitWithPutError("accept() failed");
+				utils::exitWithPutError("recv() failed");
 			}
 			debug("recv == -1");
 			return false;

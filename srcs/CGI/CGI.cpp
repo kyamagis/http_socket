@@ -39,8 +39,6 @@ void CGI::_convertMapToEnv(void)
 
 void CGI::_x_execve(char **argv)
 {
-	utils::putError(argv[0]);
-	utils::putError(argv[1]);
 	if (execve(argv[0], argv, this->_envp) == -1)
 	{
 		utils::putError("execve() fail");
@@ -51,6 +49,7 @@ void CGI::_x_execve(char **argv)
 void	CGI::_exeExecve()
 {
 	str_ command_line_options = this->_cgi_path + " " + this->_file_path;
+
 	char **argv = cgi_utils::makeCharDoublePointer(command_line_options);
 	if (_method == "POST")
 	{
@@ -255,10 +254,12 @@ int CGI::readAndWaitpid()
 		}
 		return status_code;
 	}
-	if (waitpid(this->_pid, &wstatus, WNOHANG) == -1)
+	if (waitpid(this->_pid, &wstatus, WNOHANG) != 0)
 	{
 		if (!WIFEXITED(wstatus))
 		{
+			utils::x_close(readfd);
+			debug(this->_cgi_exec_result);
 			return 500;
 		}
 		switch (WEXITSTATUS(wstatus))
@@ -266,6 +267,8 @@ int CGI::readAndWaitpid()
 			case EXIT_SUCCESS:
 				return CONTINUE;
 			default:
+				utils::x_close(readfd);
+				debug(this->_cgi_exec_result);
 				return 500;
 		}
 	}

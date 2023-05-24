@@ -124,7 +124,8 @@ int	MessageManagement::makeResponseMessage(t_response_message &response_message)
 	if (local_status_code == 200)
 	{
 		local_status_code = this->method_p->exeMethod(this->server);
-		if (local_status_code == CGI_write || local_status_code == CGI_read_body)
+		
+		if (local_status_code == CGI_write || local_status_code == CGI_read_header)
 		{
 			return local_status_code;
 		}
