@@ -55,6 +55,11 @@ class IOMultiplexing
 		map_fd_MessageManagement_	_fd_MessageManagement;
 		map_pipefd_fd_				_pipefd_fd;
 
+		void	_decrementMaxDescripotor(int fd);
+		void	_setSendResponse(int accepted_socket, const t_response_message &response_message);
+		void	_setStoreCGIResponse(int accepted_socket);
+		void	_setWriteCGI(int accepted_socket);
+
 	public:
 		IOMultiplexing(const vec_sever_	&servers, const vec_int_ &vec_ports);
 		~IOMultiplexing();
@@ -70,7 +75,7 @@ class IOMultiplexing
 		bool	isCGIReadFd(int read_fd);
 		bool	isCGIWriteFd(int write_fd);
 		void	storeCGIResponse(int read_fd);
-		void	decrementMaxDescripotor(int fd);
+		
 };
 
 #endif

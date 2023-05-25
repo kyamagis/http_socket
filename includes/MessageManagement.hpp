@@ -4,9 +4,10 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
-#include <map>
 #include <deque>
+#include <cstring>
+
+#include <arpa/inet.h>
 
 #include "./utils.hpp"
 #include "./GET.hpp"
@@ -14,7 +15,6 @@
 #include "./DELETE.hpp"
 #include "./ErrorRequest.hpp"
 #include "./Request.hpp"
-#include "./IOMultiplexing.hpp"
 #include "./Response.hpp"
 
 #define deq_Method_ std::deque<Method>

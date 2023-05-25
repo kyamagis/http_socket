@@ -42,7 +42,7 @@ int GET::_startCGI(const str_ &contents_path)
 int	GET::endCGI()
 {
 	this->_response_entity_body.setValue(this->cgi.getCGIExecResult());
-	this->_response_content_type = this->content_type.getValue();
+	this->_response_content_type = this->cgi.content_type.getValue();
 	return 200;
 }
 
