@@ -12,7 +12,8 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <netinet/in.h>
+#include <netdb.h>
+// #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -30,9 +31,9 @@ namespace IOM_utils
 	int		x_socket(int domain, int type, int protocol);
 	void	setSockaddr_in(int port, struct sockaddr_in *addr);
 	int		x_setsockopt(int serv_socket, int level, int optname);
-	int		x_bind(int serv_socket, struct sockaddr_in addr, socklen_t addr_len);
+	int		x_bind(int serv_socket, struct sockaddr *ai_addr, socklen_t ai_addrlen);
 	int		x_listen(int serv_socket, int backlog);
-	int		createListeningSocket(int port);
+	int		createListeningSocket(const char *host, int port);
 	bool	recvRequest(int accepted_socket, char *buffer);
 }
 

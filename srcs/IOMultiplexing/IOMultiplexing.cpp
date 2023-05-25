@@ -31,9 +31,9 @@ IOMultiplexing &IOMultiplexing::operator=(const IOMultiplexing &rhs)
 	return *this;
 }
 
-IOMultiplexing::IOMultiplexing(const vec_sever_	&servers, const vec_int_ &vec_ports): _servers(servers)
+IOMultiplexing::IOMultiplexing(const vec_sever_	&servers): _servers(servers)
 {
-	IOMultiplexing::createVecListeningSocket(vec_ports);
+	IOMultiplexing::createVecListeningSocket();
 	IOMultiplexing::initMasterReadfds();
 	_timeout.tv_sec = 0;
 	_timeout.tv_usec = 200;
@@ -48,17 +48,17 @@ IOMultiplexing::~IOMultiplexing()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void	IOMultiplexing::createVecListeningSocket(const vec_int_ &vec_ports)
+void	IOMultiplexing::createVecListeningSocket()
 {
 	int	listening_socket;
 	int	max_descripotor = 0;
 
-	for (size_t i = 0; i < vec_ports.size(); i++)
+	for (size_t i = 0; i < this->_servers.size(); i++)
 	{
 		if (max_descripotor == FD_SETSIZE - 2)
 			return ;
-		listening_socket = IOM_utils::createListeningSocket(vec_ports[i]);
-		std::cout << "port: " << vec_ports[i];
+		listening_socket = IOM_utils::createListeningSocket(this->_servers[i].listen_host.getValue().c_str(), 
+															this->_servers[i].listen_port.getValue());
 		if (listening_socket == -1)
 		{
 			std::cout << ", bind() failed: " << strerror(errno) << std::endl;
