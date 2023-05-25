@@ -85,12 +85,13 @@ void IOMultiplexing::initMasterReadfds()
 	}
 }
 
-void	IOMultiplexing::decrementMaxDescripotor(int fd)
+void	IOMultiplexing::_decrementMaxDescripotor(int fd, int exclusion_fd)
 {
 	if (fd == this->_max_descripotor)
 	{	
-		while (!FD_ISSET(this->_max_descripotor, &this->_master_readfds) && \
-				!FD_ISSET(this->_max_descripotor, &this->_master_writefds))
+		while (this->_max_descripotor != exclusion_fd &&
+			!FD_ISSET(this->_max_descripotor, &this->_master_readfds) && 
+			!FD_ISSET(this->_max_descripotor, &this->_master_writefds))
 			this->_max_descripotor -= 1;
 	}
 }
@@ -112,7 +113,7 @@ void	IOMultiplexing::sendResponse(int accepted_socket)
 	if (sent_len < 1 || RESPONSE_MESSAGE.size() == (size_t)sent_len)
 	{
 		FD_CLR(accepted_socket, &this->_master_writefds);
-		IOMultiplexing::decrementMaxDescripotor(accepted_socket);
+		IOMultiplexing::_decrementMaxDescripotor(accepted_socket, STDERR_FILENO);
 		utils::x_close(accepted_socket);
 
 		debug("---------------------------------------------");
@@ -163,6 +164,40 @@ void	IOMultiplexing::createAcceptedSocket(int listening_socket)
 	}
 }
 
+void	IOMultiplexing::_setSendResponse(int accepted_socket, const t_response_message &response_message)
+{
+	int	fd = accepted_socket;
+
+	FD_SET(accepted_socket, &this->_master_writefds);
+	DEQ_RESPONSE_MESSAGE.push_back(response_message);
+	ATTRIBUTION = NOT_CGI;
+	INIT_REQUEST_CLASS;
+	delete METHOD_P;
+	METHOD_P = NULL;
+}
+
+void	IOMultiplexing::_setStoreCGIResponse(int accepted_socket)
+{
+	int	fd = accepted_socket;
+
+	FD_SET(READ_FD, &this->_master_readfds);
+	ATTRIBUTION = READ_CGI;
+	this->_pipefd_fd[READ_FD] = accepted_socket;
+	if (this->_max_descripotor < READ_FD)
+		this->_max_descripotor = READ_FD;
+}
+
+void	IOMultiplexing::_setWriteCGI(int accepted_socket)
+{
+	int	fd = accepted_socket;
+
+	FD_SET(WRITE_FD, &this->_master_writefds);
+	ATTRIBUTION = WRITE_CGI;
+	this->_pipefd_fd[WRITE_FD] = accepted_socket;
+	if (this->_max_descripotor < WRITE_FD)
+		this->_max_descripotor = WRITE_FD;
+}
+
 /* 基底回数以上になったら、閉じる動作を入れる */
 void	IOMultiplexing::storeRequestToMap(int fd)
 {
@@ -182,28 +217,18 @@ void	IOMultiplexing::storeRequestToMap(int fd)
 
 	FD_CLR(accepted_socket, &this->_master_readfds);
 	int	cgi_flg = MAKE_RESPONSE_MESSAGE;
+	debug(this->_fd_MessageManagement[accepted_socket]);
 	if (cgi_flg == CGI_write)
 	{
-		ATTRIBUTION = WRITE_CGI;
-		this->_pipefd_fd[WRITE_FD] = accepted_socket;
-		FD_SET(WRITE_FD, &this->_master_writefds);
+		IOMultiplexing::_setWriteCGI(accepted_socket);
 	}
 	else if (cgi_flg == CGI_read_header)
 	{
-		ATTRIBUTION = READ_CGI;
-		this->_pipefd_fd[READ_FD] = accepted_socket;
-		FD_SET(READ_FD, &this->_master_readfds);
-		if (this->_max_descripotor < READ_FD)
-			this->_max_descripotor = READ_FD;
+		IOMultiplexing::_setStoreCGIResponse(accepted_socket);
 	}
 	else
 	{
-		FD_SET(accepted_socket, &this->_master_writefds);
-		DEQ_RESPONSE_MESSAGE.push_back(response_message);
-		debug(this->_fd_MessageManagement[accepted_socket]);
-		INIT_REQUEST_CLASS;
-		delete METHOD_P;
-		METHOD_P = NULL;
+		IOMultiplexing::_setSendResponse(accepted_socket, response_message);
 	}
 }
 
@@ -240,7 +265,6 @@ bool	IOMultiplexing::isCGIReadFd(int read_fd)
 void	IOMultiplexing::storeCGIResponse(int read_fd)
 {
 	int	accepted_socket = this->_pipefd_fd[read_fd];
-	int	fd = accepted_socket; // 無駄無駄無駄無駄
 	t_response_message	response_message;
 	
 	if (this->_fd_MessageManagement[accepted_socket].readCGIResponse(response_message) == CONTINUE)
@@ -248,21 +272,15 @@ void	IOMultiplexing::storeCGIResponse(int read_fd)
 		return ;
 	}
 	// CGI の関数でread_fdはclose()した.
-	DEQ_RESPONSE_MESSAGE.push_back(response_message);
-	ATTRIBUTION = NOT_CGI;
 	FD_CLR(read_fd, &this->_master_readfds);
 	this->_pipefd_fd.erase(READ_FD);
-	IOMultiplexing::decrementMaxDescripotor(read_fd);
-	FD_SET(accepted_socket, &this->_master_writefds);
-	INIT_REQUEST_CLASS;
-	delete METHOD_P;
-	METHOD_P = NULL;
+	IOMultiplexing::_decrementMaxDescripotor(read_fd, accepted_socket);
+	IOMultiplexing::_setSendResponse(accepted_socket, response_message);
 }
 
 void	IOMultiplexing::writeCGI(int write_fd) //　エラーの場合、レスポンスメッセージを書く
 {
 	int	accepted_socket = this->_pipefd_fd[write_fd];
-	int	fd = accepted_socket;
 	t_response_message	response_message;
 	int	status = this->_fd_MessageManagement[accepted_socket].writeCGIRequest(response_message);
 
@@ -272,20 +290,14 @@ void	IOMultiplexing::writeCGI(int write_fd) //　エラーの場合、レスポ�
 	}
 	FD_CLR(write_fd, &this->_master_writefds);
 	this->_pipefd_fd.erase(WRITE_FD);
-	IOMultiplexing::decrementMaxDescripotor(write_fd);
+	IOMultiplexing::_decrementMaxDescripotor(write_fd, accepted_socket);
 	if (status == 500)
 	{
-		FD_SET(accepted_socket, &this->_master_writefds);
-		DEQ_RESPONSE_MESSAGE.push_back(response_message);
-		ATTRIBUTION = NOT_CGI;
-		INIT_REQUEST_CLASS;
-		delete METHOD_P;
-		METHOD_P = NULL;
+		IOMultiplexing::_setSendResponse(accepted_socket, response_message);
 	}
 	else if (status == END)
 	{
-		FD_SET(READ_FD, &this->_master_readfds);
-		ATTRIBUTION = READ_CGI;
+		IOMultiplexing::_setStoreCGIResponse(accepted_socket);
 	}
 }
 
@@ -312,7 +324,7 @@ void	IOMultiplexing::IOMultiplexingLoop()
 				if (FD_ISSET(fd, &this->_writefds))
 				{
 					if (IOMultiplexing::isCGIWriteFd(fd))
-					{
+					{	
 						IOMultiplexing::writeCGI(fd);
 					}
 					else if (ATTRIBUTION == NOT_CGI)

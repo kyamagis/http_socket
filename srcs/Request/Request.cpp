@@ -268,7 +268,6 @@ void	Request::parseHeaders(const vec_str_ &request_headers)
 		}
 		else if (lower_str == "content-length" && 1 < vec_split_a_header.size())
 		{
-				debug(request_headers[i]);
 			Request::parseContentLength(vec_split_a_header);
 		}
 		else if (lower_str == "transfer-encoding" && 1 < vec_split_a_header.size())
@@ -361,7 +360,6 @@ bool Request::storeEntityBodyChunked()
 
 bool Request::storeEntityBodyContentLength()
 {
-	debug("storeEntityBodyContentLength");
 	this->request_entity_body += this->request_message.substr(0, this->content_length.getValue());
 	if (this->request_message.size() < this->content_length.getValue())
 	{

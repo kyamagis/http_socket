@@ -229,7 +229,6 @@ int	CGI::_waitpid(int status_code)
 	}
 	if (waitpid_val == this->_pid)
 	{
-		debug(waitpid_val);
 		if (!WIFEXITED(wstatus))
 		{
 			utils::x_close(readfd);
