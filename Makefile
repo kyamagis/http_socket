@@ -34,4 +34,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 test: all
 	./webserv config/default.conf
 
-.PHONY: all clean fclean re test
+cgi: all
+	./webserv config/cgi.conf
+
+.PHONY: all clean fclean re test cgi

@@ -57,6 +57,7 @@ class CGI
 		int		_parseCGIResponseHeaders();
 		int		_parseCGIResponseEntityBody();
 		int		_forkAndClose();
+		int		_waitpid(int status_code);
 
 	public:
 

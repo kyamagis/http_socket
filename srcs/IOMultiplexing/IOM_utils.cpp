@@ -93,23 +93,11 @@ namespace IOM_utils
 		{
 			if (errno != EWOULDBLOCK)
 			{
-				utils::exitWithPutError("accept() failed");
+				utils::exitWithPutError("recv() failed");
 			}
 			debug("recv == -1");
 			return false;
 		}
 		return true;
 	}
-
-	str_	makeResponseMessage(str_ &entity_body)
-	{
-		str_	response_message = "HTTP/1.1 200 OK\r\n";
-		response_message += "Connection: close\r\n";
-		response_message += "Content-Type: text/plane\r\n";
-		response_message += "Content-Length: " + utils::to_string(entity_body.size()) + "\r\n\r\n";
-		response_message += entity_body;
-
-		return response_message;
-	}
-
 }

@@ -314,7 +314,7 @@ bool Request::storeEntityBodyChunked()
 	size_t	cr_lf_pos;
 	bool	over_flow;
 
-	for(; this->request_message.size();)
+	while (0 < this->request_message.size())
 	{
 		cr_lf_pos = this->request_message.find("\r\n");
 		if (cr_lf_pos == str_::npos)

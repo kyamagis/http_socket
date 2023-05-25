@@ -39,8 +39,6 @@ void CGI::_convertMapToEnv(void)
 
 void CGI::_x_execve(char **argv)
 {
-	utils::putError(argv[0]);
-	utils::putError(argv[1]);
 	if (execve(argv[0], argv, this->_envp) == -1)
 	{
 		utils::putError("execve() fail");
@@ -51,6 +49,7 @@ void CGI::_x_execve(char **argv)
 void	CGI::_exeExecve()
 {
 	str_ command_line_options = this->_cgi_path + " " + this->_file_path;
+
 	char **argv = cgi_utils::makeCharDoublePointer(command_line_options);
 	if (_method == "POST")
 	{
@@ -166,9 +165,9 @@ int	CGI::_parseCGIResponseHeaders()
 			return CGI::_parseContentLength(vec_split_a_header);
 		}
 	}
-	if (this->content_type.getStatus() == NOT_SET || this->content_length.getStatus() == NOT_SET)
+	if (this->content_type.getStatus() == NOT_SET)
 	{
-		debug("type, length not set");
+		debug("contet-type is not set");
 		return 500;
 	}
 	return 200;
@@ -201,6 +200,10 @@ ssize_t	CGI::_readExecResulet()
 
 int	CGI::_parseCGIResponseEntityBody()
 {
+	if (this->content_length.getStatus() == NOT_SET)
+	{
+		return CONTINUE;
+	}
 	if (this->content_length.getValue() <= this->_cgi_exec_result.size())
 	{
 		this->_cgi_exec_result.substr(0, this->content_length.getValue());
@@ -209,16 +212,56 @@ int	CGI::_parseCGIResponseEntityBody()
 	return CONTINUE;
 }
 
+int	CGI::_waitpid(int status_code)
+{
+	int	readfd = this->_pipefd_for_read_cgi_execution_result[READ];
+	int	wstatus;
+	int waitpid_val = waitpid(this->_pid, &wstatus, WNOHANG);
+
+	if (status_code == END || status_code == 500)
+	{
+		utils::x_close(readfd);
+		if (waitpid_val == 0)
+		{
+			cgi_utils::x_kill(this->_pid);
+		}
+		return status_code;
+	}
+	if (waitpid_val == this->_pid)
+	{
+		debug(waitpid_val);
+		if (!WIFEXITED(wstatus))
+		{
+			utils::x_close(readfd);
+			return 500;
+		}
+		switch (WEXITSTATUS(wstatus))
+		{
+			case EXIT_SUCCESS:
+				return CONTINUE;
+			default:
+				utils::x_close(readfd);
+				return 500;
+		}
+	}
+	// シグナルを検知しても、CONTINUE
+	return CONTINUE;
+}
+
 int CGI::readAndWaitpid()
 {
-	int		readfd = this->_pipefd_for_read_cgi_execution_result[READ];
 	clock_t	start_time = cgi_utils::getMicroSec(0);
 	int		status_code = 0;
+	ssize_t	read_len = CGI::_readExecResulet();
 
-	if (CGI::_readExecResulet() == -1)
+	if (read_len == -1)
 	{
 		debug("read_len == -1");
 		status_code = 500;
+	}
+	if (read_len == 0)
+	{
+		status_code = END;
 	}
 	else if (this->cgi_phase == CGI_read_header)
 	{
@@ -245,31 +288,7 @@ int CGI::readAndWaitpid()
 	{
 		this->_time_limit += - end_time + start_time;
 	}
-	int	wstatus;
-	if (status_code == END || status_code == 500)
-	{
-		utils::x_close(readfd);
-		if (waitpid(this->_pid, &wstatus, WNOHANG) == 0)
-		{
-			cgi_utils::x_kill(this->_pid);
-		}
-		return status_code;
-	}
-	if (waitpid(this->_pid, &wstatus, WNOHANG) == -1)
-	{
-		if (!WIFEXITED(wstatus))
-		{
-			return 500;
-		}
-		switch (WEXITSTATUS(wstatus))
-		{
-			case EXIT_SUCCESS:
-				return CONTINUE;
-			default:
-				return 500;
-		}
-	}
-	return CONTINUE;
+	return CGI::_waitpid(status_code);
 }
 
 int CGI::_pipeAndFcntl()

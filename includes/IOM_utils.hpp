@@ -34,8 +34,6 @@ namespace IOM_utils
 	int		x_listen(int serv_socket, int backlog);
 	int		createListeningSocket(int port);
 	bool	recvRequest(int accepted_socket, char *buffer);
-	str_	makeResponseMessage(str_ &entity_body);
-
 }
 
 #endif
