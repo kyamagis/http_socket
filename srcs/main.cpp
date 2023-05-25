@@ -26,7 +26,7 @@ int	main(int argc, char **argv)
 
 	signal(SIGPIPE, SIG_IGN);
 
-	IOMultiplexing	iom(config.getServers(), config.getPorts());
+	IOMultiplexing	iom(config.getServers());
 
 	debug("サーバー起動!!");
 

@@ -313,9 +313,11 @@ int CGI::_pipeAndFcntl()
 		utils::x_close(this->_pipefd_for_read_cgi_execution_result[READ]);
 		return -1;
 	}
-	if (utils::x_fcntl(this->_pipefd_for_read_cgi_execution_result[READ], F_SETFL, O_NONBLOCK) == -1)
+	if (utils::x_fcntl(this->_pipefd_for_send_request_entity_body_to_cgi[READ], F_SETFL, O_NONBLOCK) == -1)
 	{
+		utils::x_close(this->_pipefd_for_send_request_entity_body_to_cgi[WRITE]);
 		utils::x_close(this->_pipefd_for_read_cgi_execution_result[WRITE]);
+		utils::x_close(this->_pipefd_for_read_cgi_execution_result[READ]);
 		return -1;
 	}
 	return 0;

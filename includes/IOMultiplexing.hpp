@@ -61,10 +61,10 @@ class IOMultiplexing
 		void	_setWriteCGI(int accepted_socket);
 
 	public:
-		IOMultiplexing(const vec_sever_	&servers, const vec_int_ &vec_ports);
+		IOMultiplexing(const vec_sever_	&servers);
 		~IOMultiplexing();
 
-		void	createVecListeningSocket(const vec_int_ &vec_ports);
+		void	createVecListeningSocket();
 		void	initMasterReadfds();
 		void	IOMultiplexingLoop();
 		void	sendResponse(int clnt_socket);
