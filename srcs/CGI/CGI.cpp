@@ -208,7 +208,7 @@ int	CGI::_parseCGIResponseEntityBody()
 	}
 	if (this->content_length.getValue() <= this->_cgi_exec_result.size())
 	{
-		this->_cgi_exec_result.substr(0, this->content_length.getValue());
+		this->_cgi_exec_result = this->_cgi_exec_result.substr(0, this->content_length.getValue());
 		return END;
 	}
 	return CONTINUE;
