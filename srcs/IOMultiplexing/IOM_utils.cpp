@@ -100,16 +100,4 @@ namespace IOM_utils
 		}
 		return true;
 	}
-
-	str_	makeResponseMessage(str_ &entity_body)
-	{
-		str_	response_message = "HTTP/1.1 200 OK\r\n";
-		response_message += "Connection: close\r\n";
-		response_message += "Content-Type: text/plane\r\n";
-		response_message += "Content-Length: " + utils::to_string(entity_body.size()) + "\r\n\r\n";
-		response_message += entity_body;
-
-		return response_message;
-	}
-
 }

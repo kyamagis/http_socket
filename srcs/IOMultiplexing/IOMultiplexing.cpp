@@ -181,7 +181,7 @@ void	IOMultiplexing::storeRequestToMap(int fd)
 	t_response_message	response_message;
 
 	FD_CLR(accepted_socket, &this->_master_readfds);
-	int	cgi_flg = MAKE_RESPONSE_MESSAGE;;
+	int	cgi_flg = MAKE_RESPONSE_MESSAGE;
 	if (cgi_flg == CGI_write)
 	{
 		ATTRIBUTION = WRITE_CGI;
