@@ -158,11 +158,13 @@ int	CGI::_parseCGIResponseHeaders()
 		lower_str = utils::ft_strlwr(vec_split_a_header[0]);
 		if (lower_str == "content-type" && 1 < vec_split_a_header.size())
 		{
-			return CGI::_parseContentType(vec_split_a_header);
+			if (CGI::_parseContentType(vec_split_a_header) == 500)
+				return 500;
 		}
 		else if (lower_str == "content-length" && 1 < vec_split_a_header.size())
 		{
-			return CGI::_parseContentLength(vec_split_a_header);
+			if (CGI::_parseContentLength(vec_split_a_header) == 500)
+				return 500;
 		}
 	}
 	if (this->content_type.getStatus() == NOT_SET)
