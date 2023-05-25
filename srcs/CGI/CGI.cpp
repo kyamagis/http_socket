@@ -227,6 +227,8 @@ int	CGI::_waitpid(int status_code)
 		{
 			cgi_utils::x_kill(this->_pid);
 		}
+		if (status_code == END && this->cgi_phase == CGI_read_header)
+			return 500;
 		return status_code;
 	}
 	if (waitpid_val == this->_pid)
