@@ -36,6 +36,9 @@ class Method
 
 		str_		response_message;
 
+		str_		server_name;
+		int			request_port;
+
 		str_		method;
 		str_		uri;
 		str_ 		version;
@@ -70,7 +73,7 @@ class Method
 		Value<str_>		getResponse_redirect_uri();
 		str_			getContentType();	
 		Value<str_>		getRequest_entity_body();
-		map_env_		setEnv();
+		map_env_		setEnv(const str_ &contents_path);
 
 		virtual	int	exeMethod(const Server& server);
 		virtual	int	endCGI();

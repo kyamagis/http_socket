@@ -108,6 +108,8 @@ int	Method::handleLocation(const Server& server)
 {
 	int	status_code;
 
+	this->server_name = server.server_name.getValue();
+	this->request_port = server.listen_port.getValue();
 	status_code = Method::setLocation(server);
 	if (status_code != 200)
 		return status_code;
@@ -146,20 +148,23 @@ int	Method::joinIndex(str_& contents_path)
 	return 404;
 }
 
-map_env_	Method::setEnv()
+map_env_	Method::setEnv(const str_ &contents_path)
 {
 	map_env_	map_env;
 
-	map_env["METHOD"] = this->method;
-	map_env["URI"] = this->uri;
-	map_env["VERSION"] = this->version;
-	map_env["HOST"] = this->host.getValue();
-	if (this->port != -1)
-		map_env["PORT"] = this->port;
 	if (this->content_type.getStatus())
 		map_env["CONTENT_TYPE"] = this->content_type.getValue();
 	if (this->content_length.getStatus())
 		map_env["CONTENT_LENGTH"] = utils::to_string(this->content_length.getValue());
+	map_env["PATH_INFO"] = contents_path;
+	map_env["REQUEST_METHOD"] = this->method;
+	map_env["SERVER_NAME"] = this->server_name;
+	map_env["SERVER_PORT"] = utils::to_string(this->request_port);
+	map_env["SERVER_PROTOCOL"] = this->version;
+	map_env["URI"] = this->uri;
+	
+	map_env["HOST"] = this->host.getValue();
+	
 	return map_env;
 }
 

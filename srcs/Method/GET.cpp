@@ -34,7 +34,7 @@ int GET::_readFileContents(const str_ &contents_path)
 
 int GET::_startCGI(const str_ &contents_path)
 {
-	this->cgi.setCGI("GET", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
+	this->cgi.setCGI("GET", CGI_PATH, Method::setEnv(contents_path), contents_path, this->request_entity_body);
 
 	return this->cgi.startCGI();
 }
