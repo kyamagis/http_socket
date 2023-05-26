@@ -19,7 +19,7 @@ int	POST::_startCGI(const str_ &contents_path)
 	{
 		return 500; //適当
 	}
-	this->cgi.setCGI("POST", CGI_PATH, Method::setEnv(), contents_path, this->request_entity_body);
+	this->cgi.setCGI("POST", CGI_PATH, Method::setEnv(contents_path), contents_path, this->request_entity_body);
 	this->_contents_path = contents_path;
 	return this->cgi.startCGI();
 }
