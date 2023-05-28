@@ -66,6 +66,7 @@ void	MessageManagement::searchServer(int accepted_socket, const vec_sever_ &serv
 
 	for (size_t i = 0; i < servers.size(); i++)
 	{
+		
 		if (accepted_socket_port == servers[i].listen_port.getValue())
 		{
 			if (first_flg == false)
@@ -73,7 +74,7 @@ void	MessageManagement::searchServer(int accepted_socket, const vec_sever_ &serv
 				maching_server_idx = i;
 				first_flg = true;
 			}
-			if (this->host.getValue()== servers[i].listen_host.getValue())
+			if (this->host.getValue()== servers[i].server_name.getValue())
 			{
 				this->server = servers[i];
 				return ;
