@@ -77,6 +77,7 @@ int GET::_exeAutoindex(const str_ &directory_path)
 	str += "</pre><hr></body>\n";
 	str += "</html>\n";
 	this->_response_entity_body.setValue(str);
+	this->_response_content_type = "text/html";
 	return 200;
 }
 
