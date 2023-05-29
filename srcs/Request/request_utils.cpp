@@ -195,6 +195,8 @@ namespace request_utils
 
 	int overwriteFile(const str_ &file_content, const str_ &file_name)
 	{
+		if (access(file_name.c_str(), F_OK) == NOT_FOUND)
+			return 404;
 		if (access(file_name.c_str(), F_OK) == FOUND &&
 			access(file_name.c_str(), R_OK) == NOT_FOUND)
 			return 403;
@@ -205,7 +207,7 @@ namespace request_utils
 	{
 		if (access(file_name.c_str(), F_OK) == FOUND)
 		{
-			return 500;
+			return 403;
 		}
 		return writeFile(file_content, file_name);
 	}
