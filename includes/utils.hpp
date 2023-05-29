@@ -69,6 +69,7 @@ namespace utils
 	int		x_fcntl(int fd, int cmd, int flg);
 	str_	ft_strlwr(const str_ &str);
 	long	myStrToLL(str_ str);
+	str_	joinPath(const str_& path_front, const str_& path_back);
 }
 
 

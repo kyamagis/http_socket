@@ -14,11 +14,11 @@ int GET::_readFileContents(const str_ &contents_path)
 {
 	std::ifstream ifs;
 
-	if (request_utils::isAtStrLast(contents_path, "/"))
+	if (method_utils::isAtStrLast(contents_path, "/"))
 		return 404;
-	if (access(contents_path.c_str(), F_OK) == NOT_FOUND)
+	if (access(method_utils::eraseHeadDot(contents_path).c_str(), F_OK) == NOT_FOUND)
 		return 404;
-	if (access(contents_path.c_str(), R_OK) == NOT_FOUND)
+	if (access(method_utils::eraseHeadDot(contents_path).c_str(), R_OK) == NOT_FOUND)
 		return 403;
 	ifs.open(contents_path.c_str());
 	if (!ifs || !ifs.is_open())
@@ -26,7 +26,7 @@ int GET::_readFileContents(const str_ &contents_path)
 	str_ tmp((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 	this->_response_entity_body.setValue(tmp);
 	ifs.close();
-	this->_response_content_type = request_utils::discriminateExtension(contents_path);
+	this->_response_content_type = method_utils::discriminateExtension(contents_path);
 	return 200;
 }
 
@@ -82,7 +82,7 @@ int GET::_exeAutoindex(const str_ &directory_path)
 
 int GET::_dealWithIndexAndAutoindex(str_ &contents_path)
 {
-	if (request_utils::isAtStrLast(this->uri, "/") == false)
+	if (method_utils::isAtStrLast(this->uri, "/") == false)
 		return CONTINUE;
 	int status_code = 0;
 	if (this->uri == this->_location.path.getValue())

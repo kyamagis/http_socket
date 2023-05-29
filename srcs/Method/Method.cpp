@@ -63,10 +63,10 @@ Method &Method::operator=(const Method &rhs)
 
 bool	Method::isBackSlashAtPathAndRootLast()
 {
-	if (!request_utils::isAtStrLast(this->_location.path.getValue(), "/"))
+	if (!method_utils::isAtStrLast(this->_location.path.getValue(), "/"))
 		return false;
 	if (this->_location.root.getStatus())
-		if (!request_utils::isAtStrLast(this->_location.root.getValue(), "/"))
+		if (!method_utils::isAtStrLast(this->_location.root.getValue(), "/"))
 			return false;
 	return true;
 }
@@ -126,7 +126,7 @@ str_	Method::makeContentsPath(const Server& server)
 	contents_path = this->uri;
 	contents_path.erase(0, this->_location.path.getValue().length());
 	contents_path.insert(0, this->_location.root.getValue());
-	contents_path = request_utils::joinPath(server.root.getValue(), contents_path);
+	contents_path = utils::joinPath(server.root.getValue(), contents_path);
 	return (contents_path);
 }
 
@@ -139,7 +139,7 @@ int	Method::joinIndex(str_& contents_path)
 	str_		tmp;
 
 	for (size_t i = 0; i < size; i++) {
-		tmp = request_utils::joinPath(contents_path, indexes[i]);
+		tmp = utils::joinPath(contents_path, indexes[i]);
 		if (access(tmp.c_str(), R_OK) == FOUND) {
 			contents_path = tmp;
 			return 200;

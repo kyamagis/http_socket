@@ -187,6 +187,16 @@ namespace utils
 		}
 		return (checkMax(num, flag, digcount));
 	}
+
+	str_ joinPath(const str_ &path_front, const str_ &path_back)
+	{
+		str_ full_path = path_front + path_back;
+
+		size_t pos_double_slash = full_path.find("//");
+		if (pos_double_slash != str_::npos && pos_double_slash == path_front.length() - 1)
+			full_path.erase(pos_double_slash, 1);
+		return (full_path);
+	}
 }
 
 namespace parse_utils

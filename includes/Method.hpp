@@ -10,6 +10,7 @@
 #include "./utils.hpp"
 #include "./RValue.hpp"
 #include "./Request.hpp"
+#include "./method_utils.hpp"
 
 #include "./Server.hpp"
 #include "./CGI.hpp"

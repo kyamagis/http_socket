@@ -43,7 +43,8 @@ str_	Response::_searchErrorPage(const int status_code, const Server &server)
 	{
 		if (vec_e_page[i].error_code.getValue() == status_code)
 		{
-			response_message = response_utils::addTypeLengthBody(vec_e_page[i].error_uri.getValue());
+			str_	error_pege_path = utils::joinPath(server.root.getValue(), vec_e_page[i].error_uri.getValue());
+			response_message = response_utils::addTypeLengthBody(error_pege_path);
 			break ;
 		}
 	}
