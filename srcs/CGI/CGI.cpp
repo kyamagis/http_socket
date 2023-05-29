@@ -253,7 +253,7 @@ int	CGI::_waitpid(int status_code)
 
 int CGI::readAndWaitpid()
 {
-	clock_t	start_time = cgi_utils::getMicroSec(0);
+	clock_t	start_time = utils::getMicroSec(0);
 	int		status_code = 0;
 	ssize_t	read_len = CGI::_readExecResulet();
 
@@ -282,7 +282,7 @@ int CGI::readAndWaitpid()
 			this->cgi_phase = CGI_end;
 		}
 	}
-	clock_t	end_time = cgi_utils::getMicroSec(0);
+	clock_t	end_time = utils::getMicroSec(0);
 	if (this->_time_limit < end_time - start_time)
 	{
 		status_code = 500;
@@ -331,7 +331,7 @@ int CGI::writeRequestEntityBodyToCGI()
 {
 	int	writefd = this->_pipefd_for_send_request_entity_body_to_cgi[WRITE];
 
-	clock_t	start_time = cgi_utils::getMicroSec(0);
+	clock_t	start_time = utils::getMicroSec(0);
 	if (this->_request_entity_body.size() == 0)
 	{
 		utils::x_close(writefd);
@@ -339,7 +339,7 @@ int CGI::writeRequestEntityBodyToCGI()
 		return END;
 	}
 	ssize_t	wrote_len = write(writefd, this->_request_entity_body.c_str(), this->_request_entity_body.size());
-	clock_t	end_time = cgi_utils::getMicroSec(0);
+	clock_t	end_time = utils::getMicroSec(0);
 	if (wrote_len < 1 || this->_time_limit < end_time - start_time)
 	{
 		utils::x_close(writefd);

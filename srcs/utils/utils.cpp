@@ -187,6 +187,17 @@ namespace utils
 		}
 		return (checkMax(num, flag, digcount));
 	}
+
+	clock_t getMicroSec(clock_t time_limit)
+	{
+		clock_t t = std::clock(); // 納得していない 定数時間を測るのに適しているとは思えない
+
+		if (t == CLOCK_FAIL)
+		{
+			return CLOCK_FAIL;
+		}
+		return (t + time_limit);
+	}
 }
 
 namespace parse_utils

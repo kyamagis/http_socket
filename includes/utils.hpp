@@ -69,6 +69,7 @@ namespace utils
 	int		x_fcntl(int fd, int cmd, int flg);
 	str_	ft_strlwr(const str_ &str);
 	long	myStrToLL(str_ str);
+	clock_t getMicroSec(clock_t time_limit);
 }
 
 
