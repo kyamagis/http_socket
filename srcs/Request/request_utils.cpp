@@ -147,6 +147,16 @@ namespace request_utils
 		return ".txt";
 	}
 
+	str_	eraseHeadDot(const str_ &str)
+	{
+		if (str.size() == 0)
+			return str;
+		if (str[0] == '.')
+			return str.substr(1);
+		else
+			return str;
+	}
+
 #define NOT_FOUND -1
 
 	str_ createUniqueFileName(const str_ &file_path, const str_ &content_type)
@@ -158,7 +168,7 @@ namespace request_utils
 
 		unique_file_name = getGMTYYYYMMDDHHMMSS();
 		path_and_unique_file_name = file_path + unique_file_name + extension;
-		if (access(path_and_unique_file_name.c_str(), F_OK) == NOT_FOUND)
+		if (access(eraseHeadDot(path_and_unique_file_name).c_str(), F_OK) == NOT_FOUND)
 		{
 			return path_and_unique_file_name;
 		}
@@ -169,7 +179,7 @@ namespace request_utils
 			unique_file_name = tmp_name;
 			unique_file_name += utils::to_string(i);
 			path_and_unique_file_name = file_path + unique_file_name + extension;
-			if (access(path_and_unique_file_name.c_str(), F_OK) == NOT_FOUND)
+			if (access(eraseHeadDot(path_and_unique_file_name).c_str(), F_OK) == NOT_FOUND)
 			{
 				return path_and_unique_file_name;
 			}
@@ -184,7 +194,7 @@ namespace request_utils
 		file_to_put.open(file_name.c_str(), std::ios::out);
 		if (!file_to_put.is_open() || !file_to_put)
 		{
-			return 500;
+			return 404;
 		}
 		file_to_put << file_content; // << std::endl;
 		file_to_put.close();
@@ -195,17 +205,23 @@ namespace request_utils
 
 	int overwriteFile(const str_ &file_content, const str_ &file_name)
 	{
-		if (access(file_name.c_str(), F_OK) == FOUND &&
-			access(file_name.c_str(), R_OK) == NOT_FOUND)
+		str_	file_path = eraseHeadDot(file_name);
+	
+		if (access(file_path.c_str(), F_OK) == NOT_FOUND)
+			return 404;
+		if (access(file_path.c_str(), F_OK) == FOUND &&
+			access(file_path.c_str(), R_OK) == NOT_FOUND)
 			return 403;
 		return writeFile(file_content, file_name);
 	}
 
 	int makeAndPutFile(const str_ &file_content, const str_ &file_name)
 	{
-		if (access(file_name.c_str(), F_OK) == FOUND)
+		str_	file_path = eraseHeadDot(file_name);
+	
+		if (access(file_path.c_str(), F_OK) == FOUND)
 		{
-			return 500;
+			return 403;
 		}
 		return writeFile(file_content, file_name);
 	}
