@@ -337,7 +337,8 @@ void	IOMultiplexing::IOMultiplexingLoop()
 		ready = select(this->_max_descripotor + 1, &this->_readfds, &this->_writefds, NULL, &this->_timeout);
 		if (ready == 0)
 		{
-			IOMultiplexing::_closeNotListeningSockets();
+			continue;
+			//IOMultiplexing::_closeNotListeningSockets();
 		}
 		else if (ready == -1)
 			utils::exitWithPutError("select() failed");
