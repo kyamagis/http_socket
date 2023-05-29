@@ -11,7 +11,6 @@ namespace cgi_utils
 	char	**dupVecToCharDoubleP(vec_str_ vec_str, size_t size);
 	char	**makeCharDoublePointer(str_ str);
 	int		x_kill(pid_t pid);
-	clock_t getMicroSec(clock_t time_limit);
 	void 	x_dup2(int oldfd, int newfd);
 }
 

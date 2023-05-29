@@ -10,7 +10,6 @@
 # include	<vector>
 # include	<map>
 # include	<exception>
-# include	<ctime>
 # include	<climits>
 # include	<cstdlib>
 # include	<unistd.h>
@@ -70,6 +69,7 @@ namespace utils
 	str_	ft_strlwr(const str_ &str);
 	long	myStrToLL(str_ str);
 	str_	joinPath(const str_& path_front, const str_& path_back);
+	clock_t getMicroSec(clock_t time_limit);
 }
 
 
