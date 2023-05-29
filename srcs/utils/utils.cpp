@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <fcntl.h>
+#include <ctime>
 
 #define vec_str_ std::vector<str_>
 
@@ -186,6 +187,27 @@ namespace utils
 			return -1;
 		}
 		return (checkMax(num, flag, digcount));
+	}
+
+	str_ joinPath(const str_ &path_front, const str_ &path_back)
+	{
+		str_ full_path = path_front + path_back;
+
+		size_t pos_double_slash = full_path.find("//");
+		if (pos_double_slash != str_::npos && pos_double_slash == path_front.length() - 1)
+			full_path.erase(pos_double_slash, 1);
+		return (full_path);
+	}
+
+	clock_t getMicroSec(clock_t time_limit)
+	{
+		clock_t t = std::clock(); // 納得していない 定数時間を測るのに適しているとは思えない
+
+		if (t == CLOCK_FAIL)
+		{
+			return CLOCK_FAIL;
+		}
+		return (t + time_limit);
 	}
 }
 

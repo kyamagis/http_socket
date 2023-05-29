@@ -14,7 +14,7 @@ POST::~POST() {}
 
 int POST::_dealWithIndex(str_ &contents_path)
 {
-	if (request_utils::isAtStrLast(this->uri, "/") == false) // this->uriがfileだったとき
+	if (method_utils::isAtStrLast(this->uri, "/") == false) // this->uriがfileだったとき
 		return 200;
 	if (this->uri == this->_location.path.getValue())
 	{
@@ -53,19 +53,23 @@ int	POST::endCGI()
 	{
 		/* contents_path で指定されたfileと同じ階層にCGIで作ったfileを置く */
 		str_ contents_directory_path = this->_contents_path.substr(0, this->_last_slash_index + 1); // ./content/index.html -> ./content/
-		file_name = request_utils::createUniqueFileName(contents_directory_path, CGI_CONTENT_TYPE);
+		file_name = method_utils::createUniqueFileName(contents_directory_path, CGI_CONTENT_TYPE);
 	}
 	else
 		file_name = this->_upload_path.getValue();
 
-	return request_utils::makeAndPutFile(cgi.getCGIExecResult(), file_name);
+	return method_utils::makeAndPutFile(cgi.getCGIExecResult(), file_name);
 }
 
 void	POST::_makeUploadPath(const Server &server)
 {
 	if (this->_location.upload_path.getStatus() == NOT_SET)
 		return;
-	str_	upload_path = request_utils::joinPath(server.root.getValue(), this->_location.upload_path.getValue());
+	str_	upload_path = utils::joinPath(server.root.getValue(), this->_location.upload_path.getValue());
+	if (0 < upload_path.size() && upload_path[upload_path.size() - 1] != '/') // ./content/upload => ./content/upload/
+	{
+		upload_path += "/";
+	}
 	this->_upload_path.setValue(upload_path);
 }
 
@@ -88,14 +92,14 @@ int POST::exeMethod(const Server &server)
 	POST::_makeUploadPath(server);
 	if (this->_location.cgi_path.getStatus() != NOT_SET)
 		return POST::_startCGI(contents_path);
-	if (request_utils::isAtStrLast(contents_path, "/")) //　contents_path　== ./directory/
+	if (method_utils::isAtStrLast(contents_path, "/")) //　contents_path　== ./directory/
 	{
 		str_ file_name;
 		if (this->_location.upload_path.getStatus() == NOT_SET)
-			file_name = request_utils::createUniqueFileName(contents_path, CONTENT_TYPE);
+			file_name = method_utils::createUniqueFileName(contents_path, CONTENT_TYPE);
 		else
-			file_name = request_utils::createUniqueFileName(this->_upload_path.getValue(), CONTENT_TYPE);
-		return request_utils::makeAndPutFile(this->request_entity_body, file_name);
+			file_name = method_utils::createUniqueFileName(this->_upload_path.getValue(), CONTENT_TYPE);
+		return method_utils::makeAndPutFile(this->request_entity_body, file_name);
 	}
-	return request_utils::overwriteFile(this->request_entity_body, contents_path);
+	return method_utils::overwriteFile(this->request_entity_body, contents_path);
 }

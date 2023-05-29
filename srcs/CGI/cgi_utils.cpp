@@ -75,17 +75,6 @@ namespace cgi_utils
 		return 508;
 	}
 
-	clock_t getMicroSec(clock_t time_limit)
-	{
-		clock_t t = std::clock(); // 納得していない 定数時間を測るのに適しているとは思えない
-
-		if (t == CLOCK_FAIL)
-		{
-			return CLOCK_FAIL;
-		}
-		return (t + time_limit);
-	}
-
 	void x_dup2(int oldfd, int newfd)
 	{
 		if (dup2(oldfd, newfd) == -1)

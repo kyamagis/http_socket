@@ -45,6 +45,7 @@ class IOMultiplexing
 
 		int			_max_descripotor;
 		vec_int_	_vec_listening_socket;
+		int			_no_ready_count;
 
 		fd_set	_master_readfds;
 		fd_set	_master_writefds;
@@ -60,21 +61,24 @@ class IOMultiplexing
 		void	_setStoreCGIResponse(int accepted_socket);
 		void	_setWriteCGI(int accepted_socket);
 
+		void	_createVecListeningSocket();
+		void	_initMasterReadfds();
+
+		void	_closeNotListeningSockets();
+		bool	_isCGIWriteFd(int write_fd);
+		void	_writeCGI(int write_fd);
+		void	_sendResponse(int clnt_socket);
+		bool	_containsListeningSocket(int fd);
+		void	_createAcceptedSocket(int listening_socket);
+		bool	_isCGIReadFd(int read_fd);
+		void	_storeCGIResponse(int read_fd);
+		void	_storeRequestToMap(int fd);
+
 	public:
 		IOMultiplexing(const vec_sever_	&servers);
 		~IOMultiplexing();
 
-		void	createVecListeningSocket();
-		void	initMasterReadfds();
 		void	IOMultiplexingLoop();
-		void	sendResponse(int clnt_socket);
-		bool	containsListeningSocket(int fd);
-		void	createAcceptedSocket(int listening_socket);
-		void	storeRequestToMap(int fd);
-		void	writeCGI(int write_fd);
-		bool	isCGIReadFd(int read_fd);
-		bool	isCGIWriteFd(int write_fd);
-		void	storeCGIResponse(int read_fd);
 		
 };
 

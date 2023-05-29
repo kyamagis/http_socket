@@ -42,7 +42,6 @@ namespace response_utils
 		str_ entity_body;
 		str_ response_message;
 
-		file_path = "./contents" + file_path;
 		entity_body = openReadErrorPage(file_path, fail_flg);
 		if (fail_flg)
 		{

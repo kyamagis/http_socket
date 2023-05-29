@@ -33,7 +33,7 @@ int	DELETE::_deleteFileOrDirectory(const str_ &contents_path)
 
 int	DELETE::_dealWithIndexAndAutoindex(str_ &contents_path)
 {
-	if (request_utils::isAtStrLast(this->uri, "/") == false)
+	if (method_utils::isAtStrLast(this->uri, "/") == false)
 		return CONTINUE;
 	int	status_code = 0;
 	if (this->uri == this->_location.path.getValue())
