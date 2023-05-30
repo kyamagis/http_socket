@@ -311,7 +311,7 @@ bool Request::storeEntityBodyChunked()
 {
 	str_	chunked_str;
 	size_t	cr_lf_pos;
-	bool	over_flow;
+	bool	over_flow = false;
 
 	while (0 < this->request_message.size())
 	{
@@ -320,15 +320,10 @@ bool Request::storeEntityBodyChunked()
 			cr_lf_pos = this->request_message.find("\r\n");
 			if (cr_lf_pos == str_::npos)
 			{
-				//this->status_code = 400;
 				return CONTINUE;
 			}
 			chunked_str = this->request_message.substr(0, cr_lf_pos);
 			this->request_message = this->request_message.substr(cr_lf_pos + 2);
-		}
-	
-		if (this->chunked_turn == NUM_TURN)
-		{
 			this->chunked_size = request_utils::hexStrToLL(chunked_str, over_flow);
 			if (over_flow)
 			{
@@ -356,7 +351,7 @@ bool Request::storeEntityBodyChunked()
 			{
 				this->chunked_turn = NUM_TURN;
 				cr_lf_pos = this->request_message.find("\r\n");
-				if (cr_lf_pos == str_::npos)
+				if (cr_lf_pos != 0)
 				{
 					this->status_code = 400;
 					return END;
