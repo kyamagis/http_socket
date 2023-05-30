@@ -34,7 +34,7 @@ namespace IOM_utils
 	int		x_bind(int serv_socket, struct sockaddr *ai_addr, socklen_t ai_addrlen);
 	int		x_listen(int serv_socket, int backlog);
 	int		createListeningSocket(const char *host, int port);
-	bool	recvRequest(int accepted_socket, char *buffer);
+	ssize_t		recvRequest(int accepted_socket, char *buffer);
 }
 
 #endif

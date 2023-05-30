@@ -95,6 +95,16 @@ void	IOMultiplexing::_decrementMaxDescripotor(int fd)
 	}
 }
 
+void	IOMultiplexing::_eraseMMAndCloseFd(int accepted_socket, fd_set *fds)
+{
+	FD_CLR(accepted_socket, fds);
+	IOMultiplexing::_decrementMaxDescripotor(accepted_socket);
+	utils::x_close(accepted_socket);
+	if (METHOD_P)
+		delete METHOD_P;
+	this->_fd_MessageManagement.erase(accepted_socket);
+}
+
 void	IOMultiplexing::_sendResponse(int accepted_socket)
 {
 	if (DEQ_RESPONSE_MESSAGE.size() == 0)
@@ -111,17 +121,18 @@ void	IOMultiplexing::_sendResponse(int accepted_socket)
 	}
 	if (sent_len < 1 || RESPONSE_MESSAGE.size() == (size_t)sent_len)
 	{
-		FD_CLR(accepted_socket, &this->_master_writefds);
-		IOMultiplexing::_decrementMaxDescripotor(accepted_socket);
-		utils::x_close(accepted_socket);
-
-		debug("---------------------------------------------");
-		debug(accepted_socket);
-		debug(RESPONSE_MESSAGE);
-		debug("---------------------------------------------");
-
-		this->_fd_MessageManagement.erase(accepted_socket);
-		
+		if (sent_len < 1)
+		{
+			debug("client closed socket");
+		}
+		else
+		{
+			debug("---------------------------------------------");
+			debug(accepted_socket);
+			debug(RESPONSE_MESSAGE);
+			debug("---------------------------------------------");
+		}
+		IOMultiplexing::_eraseMMAndCloseFd(accepted_socket, &this->_master_writefds);
 	}
 	else if ((size_t)sent_len < RESPONSE_MESSAGE.size())
 	{
@@ -200,16 +211,22 @@ void	IOMultiplexing::_storeRequestToMap(int fd)
 {
 	char	buffer[BUFF_SIZE + 1];
 	int		accepted_socket = fd; // わかりやすくするために代入した.技術的な意味はない
+	ssize_t	recved_len = IOM_utils::recvRequest(accepted_socket, buffer);
 
-	if (!IOM_utils::recvRequest(accepted_socket, buffer))
+	if (recved_len == -1)
 		return ;
-
+	if (recved_len == 0)
+	{
+		debug("client closed socket");
+		IOMultiplexing::_eraseMMAndCloseFd(accepted_socket, &this->_master_readfds);
+		std::cout << "accepted_socket: " << fd << ", max_descripotor: " 
+								<< this->_max_descripotor << std::endl;
+	}
 	REQUEST_MESSAGE += buffer;
 	if (PARSE_REQUEST_MESSAGE == CONTINUE)
 	{
 		return ;
 	}
-
 	t_response_message	response_message;
 
 	this->_fd_MessageManagement[accepted_socket].MessageManagement::searchServer(accepted_socket, this->_servers);
@@ -356,7 +373,7 @@ void	IOMultiplexing::IOMultiplexingLoop()
 					else if (ATTRIBUTION == NOT_CGI)
 					{
 						IOMultiplexing::_sendResponse(fd);
-						std::cout << "clnt_socket: " << fd << ", max_descripotor: " 
+						std::cout << "accepted_socket: " << fd << ", max_descripotor: " 
 								<< this->_max_descripotor << std::endl;
 					}
 				}

@@ -197,8 +197,6 @@ int		MessageManagement::writeCGIRequest(t_response_message &response_message)
 	}
 }
 
-
-
 std::ostream &operator<<(std::ostream &ostrm, const MessageManagement &req)
 {
 	ostrm << "++++++++++++++++++++++++++++++++++" << std::endl;
@@ -216,11 +214,14 @@ std::ostream &operator<<(std::ostream &ostrm, const MessageManagement &req)
 		ostrm << "Transfer-Encoding: " << req.transfer_encoding.getValue() << std::endl;
 	if (req.connection.getStatus())
 	{
-		ostrm << "Connection" << req.transfer_encoding.getValue() << std::endl;
+		ostrm << "Connection:        " ;
+		if (req.connection.getValue() == 1)
+			ostrm << "keep-alive" << std::endl;
+		else
+			ostrm << "close" << std::endl;
 	}
-	if (0 < req.request_entity_body.size())
-		ostrm << std::endl
-			  << req.request_entity_body << std::endl;
+	ostrm << std::endl
+		  << req.request_entity_body << std::endl;
 	ostrm << "++++++++++++++++++++++++++++++++++" << std::endl;
 	return ostrm;
 }
