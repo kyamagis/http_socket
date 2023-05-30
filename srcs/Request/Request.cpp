@@ -311,20 +311,19 @@ bool Request::storeEntityBodyChunked()
 {
 	str_	chunked_str;
 	size_t	cr_lf_pos;
-	bool	over_flow;
+	bool	over_flow = false;
 
 	while (0 < this->request_message.size())
 	{
-		cr_lf_pos = this->request_message.find("\r\n");
-		if (cr_lf_pos == str_::npos)
-		{
-			this->status_code = 400;
-			return END;
-		}
-		chunked_str = this->request_message.substr(0, cr_lf_pos);
-		this->request_message = this->request_message.substr(cr_lf_pos + 2);
 		if (this->chunked_turn == NUM_TURN)
 		{
+			cr_lf_pos = this->request_message.find("\r\n");
+			if (cr_lf_pos == str_::npos)
+			{
+				return CONTINUE;
+			}
+			chunked_str = this->request_message.substr(0, cr_lf_pos);
+			this->request_message = this->request_message.substr(cr_lf_pos + 2);
 			this->chunked_size = request_utils::hexStrToLL(chunked_str, over_flow);
 			if (over_flow)
 			{
@@ -339,13 +338,26 @@ bool Request::storeEntityBodyChunked()
 		}
 		else if (this->chunked_turn == STR_TURN)
 		{
-			if (this->chunked_size != chunked_str.size())
+			size_t	substr_len = this->chunked_size;
+
+			if (this->request_message.size() < this->chunked_size)
 			{
-				this->status_code = 400;
-				return END;
+				substr_len = this->request_message.size();
 			}
-			this->request_entity_body += chunked_str;
-			this->chunked_turn = NUM_TURN;
+			this->chunked_size -= substr_len;
+			this->request_entity_body += this->request_message.substr(0, substr_len);
+			this->request_message = this->request_message.substr(substr_len);
+			if (this->chunked_size == 0)
+			{
+				this->chunked_turn = NUM_TURN;
+				cr_lf_pos = this->request_message.find("\r\n");
+				if (cr_lf_pos != 0)
+				{
+					this->status_code = 400;
+					return END;
+				}
+				this->request_message = this->request_message.substr(cr_lf_pos + 2);
+			}
 		}
 	}
 	return CONTINUE;

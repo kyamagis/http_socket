@@ -61,6 +61,7 @@ class IOMultiplexing
 		void	_setStoreCGIResponse(int accepted_socket);
 		void	_setWriteCGI(int accepted_socket);
 
+		void	_eraseMMAndCloseFd(int accepted_socket, fd_set *fds);
 		void	_createVecListeningSocket();
 		void	_initMasterReadfds();
 

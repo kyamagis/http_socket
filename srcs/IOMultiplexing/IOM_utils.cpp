@@ -116,7 +116,7 @@ namespace IOM_utils
 
 	#define BUFF_SIZE 10240 //適当な数値
 
-	bool	recvRequest(int accepted, char *buffer)
+	ssize_t	recvRequest(int accepted, char *buffer)
 	{
 		ssize_t recved_len = 1;
 
@@ -129,8 +129,12 @@ namespace IOM_utils
 				utils::exitWithPutError("recv() failed");
 			}
 			debug("recv == -1");
-			return false;
+			return -1;
 		}
-		return true;
+		if (recved_len == 0)
+		{
+			return 0;
+		}
+		return recved_len;
 	}
 }
