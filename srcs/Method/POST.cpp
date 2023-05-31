@@ -23,8 +23,13 @@ int POST::_dealWithIndex(str_ &contents_path)
 	return 404;
 }
 
-int	POST::_startCGI(const str_ &contents_path)
+int	POST::_startCGI(const str_ &contents_path, int max_descripotor)
 {
+	if (FD_SETSIZE - 5 <= max_descripotor)
+	{
+		debug("FD_SETSIZE POST CGI");
+		return 500;
+	}
 	this->_contents_path = contents_path;
 	int	status_code = POST::_dealWithIndex(this->_contents_path);
 
@@ -75,7 +80,7 @@ void	POST::_makeUploadPath(const Server &server)
 
 #define CONTENT_TYPE this->content_type.getValue()
 
-int POST::exeMethod(const Server &server)
+int POST::exeMethod(const Server &server, int max_descripotor)
 {
 	if (this->content_type.getStatus() == NOT_SET)
 		return 400;
@@ -91,7 +96,7 @@ int POST::exeMethod(const Server &server)
 	str_ contents_path = Method::makeContentsPath(server);
 	POST::_makeUploadPath(server);
 	if (this->_location.cgi_path.getStatus() != NOT_SET)
-		return POST::_startCGI(contents_path);
+		return POST::_startCGI(contents_path, max_descripotor);
 	if (method_utils::isAtStrLast(contents_path, "/")) //　contents_path　== ./directory/
 	{
 		str_ file_name;

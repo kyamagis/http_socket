@@ -193,8 +193,9 @@ Value<str_>		Method::getRequest_entity_body()
 	return this->_request_entity_body;
 }
 
-int	Method::exeMethod(const Server& server) 
+int	Method::exeMethod(const Server& server, int max_descripotor) 
 {
-	(void)server; 
+	(void)server;
+	(void)max_descripotor;
 	return 0;
 }

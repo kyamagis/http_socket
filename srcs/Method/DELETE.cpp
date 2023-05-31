@@ -47,8 +47,9 @@ int	DELETE::_dealWithIndexAndAutoindex(str_ &contents_path)
 	return CONTINUE;
 }
 
-int	DELETE::exeMethod(const Server& server)
+int	DELETE::exeMethod(const Server& server, int max_descripotor)
 {
+	(void)max_descripotor;
 	int	status_code = Method::handleLocation(server);
 	if (status_code == 301)//DELETEでリダイレクトは、400として返す.
 		return 400;

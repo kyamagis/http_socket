@@ -45,7 +45,6 @@ class IOMultiplexing
 
 		int			_max_descripotor;
 		vec_int_	_vec_listening_socket;
-		int			_no_ready_count;
 
 		fd_set	_master_readfds;
 		fd_set	_master_writefds;
@@ -56,24 +55,28 @@ class IOMultiplexing
 		map_fd_MessageManagement_	_fd_MessageManagement;
 		map_pipefd_fd_				_pipefd_fd;
 
-		void	_decrementMaxDescripotor(int fd);
-		void	_setSendResponse(int accepted_socket, const t_response_message &response_message);
-		void	_setStoreCGIResponse(int accepted_socket);
-		void	_setWriteCGI(int accepted_socket);
-
-		void	_eraseMMAndCloseFd(int accepted_socket, fd_set *fds);
-		void	_createVecListeningSocket();
 		void	_initMasterReadfds();
+		void	_createVecListeningSocket();
 
-		void	_closeNotListeningSockets();
-		bool	_isCGIWriteFd(int write_fd);
-		void	_writeCGI(int write_fd);
-		void	_sendResponse(int clnt_socket);
+		void	_decrementMaxDescripotor(int fd);
+		void	_eraseMMAndCloseFd(int accepted_socket, fd_set *fds);
+
+		void	_switchToRecvRequest(int accepted_socket);
+		void	_switchToSendResponse(int accepted_socket, const t_response_message &response_message);
+		void	_switchToReadCGIResponse(int accepted_socket);
+		void	_switchToWriteCGI(int accepted_socket);
+
+
 		bool	_containsListeningSocket(int fd);
-		void	_createAcceptedSocket(int listening_socket);
+		bool	_isCGIWriteFd(int write_fd);
 		bool	_isCGIReadFd(int read_fd);
-		void	_storeCGIResponse(int read_fd);
-		void	_storeRequestToMap(int fd);
+	
+		void	_closeNotListeningSockets();
+		void	_sendResponse(int clnt_socket);
+		void	_recvRequest(int fd);
+		void	_createAcceptedSocket(int listening_socket);
+		void	_readCGIResponse(int read_fd);
+		void	_writeCGI(int write_fd);
 
 	public:
 		IOMultiplexing(const vec_sever_	&servers);

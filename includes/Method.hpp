@@ -76,7 +76,7 @@ class Method
 		Value<str_>		getRequest_entity_body();
 		map_env_		setEnv(const str_ &contents_path);
 
-		virtual	int	exeMethod(const Server& server);
+		virtual	int	exeMethod(const Server& server, int max_descripotor);
 		virtual	int	endCGI();
 };
 

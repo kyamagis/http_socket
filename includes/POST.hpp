@@ -11,7 +11,7 @@ class POST : public Method
 		Value<str_>	_upload_path;
 
 		int		_dealWithIndex(str_ &contents_path);
-		int		_startCGI(const str_ &contents_path);
+		int		_startCGI(const str_ &contents_path, int max_descripotor);
 		void	_makeUploadPath(const Server &server);
 
 	public:
@@ -19,7 +19,7 @@ class POST : public Method
 
 
 		virtual	~POST();
-		virtual int	exeMethod(const Server& server);
+		virtual int	exeMethod(const Server& server, int max_descripotor);
 		virtual int	endCGI();
 };
 

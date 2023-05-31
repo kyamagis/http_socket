@@ -32,8 +32,13 @@ int GET::_readFileContents(const str_ &contents_path)
 
 #define CGI_PATH this->_location.cgi_path.getValue()
 
-int GET::_startCGI(const str_ &contents_path)
+int GET::_startCGI(const str_ &contents_path, int max_descripotor)
 {
+	if (FD_SETSIZE - 3 <= max_descripotor)
+	{
+		debug("FD_SETSIZE GET CGI");
+		return 500;
+	}
 	this->cgi.setCGI("GET", CGI_PATH, Method::setEnv(contents_path), contents_path, this->request_entity_body);
 
 	return this->cgi.startCGI();
@@ -97,7 +102,7 @@ int GET::_dealWithIndexAndAutoindex(str_ &contents_path)
 	return CONTINUE;
 }
 
-int GET::exeMethod(const Server &server)
+int GET::exeMethod(const Server &server, int max_descripotor)
 {
 	int		status_code;
 	str_	contents_path;
@@ -114,6 +119,6 @@ int GET::exeMethod(const Server &server)
 		return status_code;
 	}
 	if (this->_location.cgi_path.getStatus() != NOT_SET)
-		return GET::_startCGI(contents_path);
+		return GET::_startCGI(contents_path, max_descripotor);
 	return GET::_readFileContents(contents_path);
 }

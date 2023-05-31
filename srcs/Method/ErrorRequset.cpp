@@ -7,9 +7,9 @@ ErrorRequest::ErrorRequest(const Request& r, int status_code): Method(r), _statu
 
 ErrorRequest::~ErrorRequest() {}
 
-int	ErrorRequest::exeMethod(const Server& server)
+int	ErrorRequest::exeMethod(const Server& server, int max_descripotor)
 {
-
 	(void)server;
+	(void)max_descripotor;
 	return this->_status_code;
 }

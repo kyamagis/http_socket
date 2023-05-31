@@ -13,7 +13,7 @@ class ErrorRequest : public Method
 		ErrorRequest(const Request& r, int status_code);
 		virtual	~ErrorRequest();
 
-		virtual int	exeMethod(const Server& server);
+		virtual int	exeMethod(const Server& server, int max_descripotor);
 };
 
 #endif
