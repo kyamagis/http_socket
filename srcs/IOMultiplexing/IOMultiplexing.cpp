@@ -329,8 +329,6 @@ void	IOMultiplexing::_writeCGI(int write_fd) //　エラーの場合、レスポ
 	}
 }
 
-#define NO_READY_COUNT_LIMIT 10000 //適当
-
 void	IOMultiplexing::_closeNotListeningSockets()
 {
 	for (int fd = 0; fd <= this->_max_descripotor; fd++)
