@@ -28,6 +28,19 @@ class Request
 		int			_storeChunkedStr();
 		int			_gainChunkSize();
 		bool		_storeEntityBodyChunked();
+		bool		_storeEntityBodyContentLength();
+		bool		_parseRequestEntityBody();
+		
+		void		_parseRequestLine(const str_ &request_line);
+		void		_parseConnection(const vec_str_ &vec_split_a_header);
+		void		_parseContentLength(const vec_str_ &vec_split_a_header);
+		void		_parseTransferEncoding(const vec_str_ &vec_split_a_header);
+		int			_parseMime(const str_ &lower_str, const vec_str_ &vec_split_a_header);
+		void		_parseContentType(const vec_str_ &vec_split_a_header);
+		void		_parseHost(const str_ &host_header);
+		void		_parseHeaders(const vec_str_ &request_headers);
+		vec_str_	_spliteRequestLineAndHeader(size_t entity_body_pos);
+		bool		_parseRequestLineAndHeaders(size_t entity_body_pos);
 		
 	public:
 
@@ -58,18 +71,6 @@ class Request
 
 		void	initResponseClass();
 
-		vec_str_	spliteRequestLineAndHeader(size_t entity_body_pos);
-		void		parseRequestLine(const str_ &request_line);
-		void		parseHost(const str_ &host_header);
-		void		parseHeaders(const vec_str_ &request_headers);
-		void		parseContentType(const vec_str_ &vec_split_a_header);
-		int			parseMime(const str_ &lower_str, const vec_str_ &vec_split_a_header);
-		void		parseContentLength(const vec_str_ &vec_split_a_header);
-		void		parseTransferEncoding(const vec_str_ &vec_split_a_header);
-		void		parseConnection(const vec_str_ &vec_split_a_header);
-		bool		parseRequestLineAndHeaders(size_t entity_body_pos);
-		bool		parseRequestEntityBody();
-		bool		storeEntityBodyContentLength();
 		bool		parseRequstMessage();
 
 
