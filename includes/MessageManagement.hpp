@@ -54,7 +54,7 @@ class MessageManagement: public Request, public Response
 		MessageManagement &operator=(const MessageManagement &rhs);
 		~MessageManagement();
 
-		int		makeResponseMessage(t_response_message	&response_message);
+		int		makeResponseMessage(t_response_message	&response_message, int max_descripotor);
 		void	searchServer(int accepted_socket, const vec_sever_ &servers);
 		int 	storeMethodToDeq();
 		int		readCGIResponse(t_response_message &response_message);

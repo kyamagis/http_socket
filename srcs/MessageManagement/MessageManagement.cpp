@@ -112,7 +112,7 @@ int MessageManagement::storeMethodToDeq()
 }
 
 
-int	MessageManagement::makeResponseMessage(t_response_message &response_message)
+int	MessageManagement::makeResponseMessage(t_response_message &response_message, int max_descripotor)
 {
 	// sigchildを無視することで、子プロセスの終了を親プロセスが待たないようにする。<= やる意味がわからない
 	// これを実行すると、waitpid()からexecve()の失敗を検知できない。それでもいいのか？
@@ -124,7 +124,7 @@ int	MessageManagement::makeResponseMessage(t_response_message &response_message)
 
 	if (local_status_code == 200)
 	{
-		local_status_code = this->method_p->exeMethod(this->server);
+		local_status_code = this->method_p->exeMethod(this->server, max_descripotor);
 	
 		if (local_status_code == CGI_write || local_status_code == CGI_read_header)
 		{

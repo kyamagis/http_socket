@@ -24,6 +24,10 @@
 class Request
 {
 	private:
+
+		int			_storeChunkedStr();
+		int			_gainChunkSize();
+		bool		_storeEntityBodyChunked();
 		
 	public:
 
@@ -66,7 +70,6 @@ class Request
 		bool		parseRequestLineAndHeaders(size_t entity_body_pos);
 		bool		parseRequestEntityBody();
 		bool		storeEntityBodyContentLength();
-		bool		storeEntityBodyChunked();
 		bool		parseRequstMessage();
 
 

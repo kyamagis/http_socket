@@ -14,7 +14,7 @@ class DELETE : public Method
 		DELETE(const Request& r);
 		virtual	~DELETE();
 
-		virtual int	exeMethod(const Server& server);
+		virtual int	exeMethod(const Server& server, int max_descripotor);
 		virtual int	endCGI();
 
 		

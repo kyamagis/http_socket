@@ -45,7 +45,6 @@ class IOMultiplexing
 
 		int			_max_descripotor;
 		vec_int_	_vec_listening_socket;
-		int			_no_ready_count;
 
 		fd_set	_master_readfds;
 		fd_set	_master_writefds;

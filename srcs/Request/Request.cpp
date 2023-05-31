@@ -307,57 +307,77 @@ bool	Request::parseRequestLineAndHeaders(size_t entity_body_pos)
 	return CONTINUE;
 }
 
-bool Request::storeEntityBodyChunked()
+#define KEEP_ON 2
+
+int	Request::_storeChunkedStr()
+{
+	size_t	substr_len = this->chunked_size;
+
+	if (this->request_message.size() < this->chunked_size)
+	{
+		substr_len = this->request_message.size();
+	}
+	this->chunked_size -= substr_len;
+	this->request_entity_body += this->request_message.substr(0, substr_len);
+	this->request_message = this->request_message.substr(substr_len);
+	if (this->chunked_size == 0)
+	{
+		this->chunked_turn = NUM_TURN;
+		size_t	cr_lf_pos = this->request_message.find("\r\n");
+		if (cr_lf_pos != 0)
+		{
+			this->status_code = 400;
+			return END;
+		}
+		this->request_message = this->request_message.substr(cr_lf_pos + 2);
+	}
+	return KEEP_ON;
+}
+
+int	Request::_gainChunkSize()
 {
 	str_	chunked_str;
 	size_t	cr_lf_pos;
 	bool	over_flow = false;
 
+	cr_lf_pos = this->request_message.find("\r\n");
+	if (cr_lf_pos == str_::npos)
+	{
+		return CONTINUE;
+	}
+	chunked_str = this->request_message.substr(0, cr_lf_pos);
+	this->request_message = this->request_message.substr(cr_lf_pos + 2);
+	this->chunked_size = request_utils::hexStrToLL(chunked_str, over_flow);
+	if (over_flow)
+	{
+		this->status_code = 400;
+		return END;
+	}
+	if (this->chunked_size == 0)
+	{
+		return END;
+	}
+	this->chunked_turn = STR_TURN;
+	return KEEP_ON;
+}
+
+bool	Request::_storeEntityBodyChunked()
+{
+	
 	while (0 < this->request_message.size())
 	{
 		if (this->chunked_turn == NUM_TURN)
 		{
-			cr_lf_pos = this->request_message.find("\r\n");
-			if (cr_lf_pos == str_::npos)
-			{
+			int	to_be_or_not_to_be = Request::_gainChunkSize();
+			if (to_be_or_not_to_be == CONTINUE)
 				return CONTINUE;
-			}
-			chunked_str = this->request_message.substr(0, cr_lf_pos);
-			this->request_message = this->request_message.substr(cr_lf_pos + 2);
-			this->chunked_size = request_utils::hexStrToLL(chunked_str, over_flow);
-			if (over_flow)
-			{
-				this->status_code = 400;
+			else if (to_be_or_not_to_be == END)
 				return END;
-			}
-			if (this->chunked_size == 0)
-			{
-				return END;
-			}
-			this->chunked_turn = STR_TURN;
 		}
 		else if (this->chunked_turn == STR_TURN)
 		{
-			size_t	substr_len = this->chunked_size;
-
-			if (this->request_message.size() < this->chunked_size)
-			{
-				substr_len = this->request_message.size();
-			}
-			this->chunked_size -= substr_len;
-			this->request_entity_body += this->request_message.substr(0, substr_len);
-			this->request_message = this->request_message.substr(substr_len);
-			if (this->chunked_size == 0)
-			{
-				this->chunked_turn = NUM_TURN;
-				cr_lf_pos = this->request_message.find("\r\n");
-				if (cr_lf_pos != 0)
-				{
-					this->status_code = 400;
-					return END;
-				}
-				this->request_message = this->request_message.substr(cr_lf_pos + 2);
-			}
+			if (Request::_storeChunkedStr() == END)
+				return END;
 		}
 	}
 	return CONTINUE;
@@ -398,7 +418,7 @@ bool	Request::parseRequestEntityBody()
 	}
 	else if (this->transfer_encoding.getStatus() != NOT_SET)
 	{
-		return Request::storeEntityBodyChunked();
+		return Request::_storeEntityBodyChunked();
 	}
 	return END;
 }

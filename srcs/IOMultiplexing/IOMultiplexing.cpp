@@ -3,7 +3,7 @@
 #define BUFF_SIZE 10240
 #define DEQ_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message
 #define RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].deq_response_message[0].response_message
-#define MAKE_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].makeResponseMessage(response_message)
+#define MAKE_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].makeResponseMessage(response_message, this->_max_descripotor)
 #define METHOD_P this->_fd_MessageManagement[accepted_socket].method_p
 #define REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].request_message
 #define PARSE_REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].parseRequstMessage()
@@ -31,12 +31,12 @@ IOMultiplexing &IOMultiplexing::operator=(const IOMultiplexing &rhs)
 	return *this;
 }
 
-IOMultiplexing::IOMultiplexing(const vec_sever_	&servers): _servers(servers), _no_ready_count(0)
+IOMultiplexing::IOMultiplexing(const vec_sever_	&servers): _servers(servers)
 {
 	IOMultiplexing::_createVecListeningSocket();
 	IOMultiplexing::_initMasterReadfds();
-	_timeout.tv_sec = 0;
-	_timeout.tv_usec = 200;
+	_timeout.tv_sec = 60;
+	_timeout.tv_usec = 0;
 	FD_ZERO(&this->_master_writefds);
 }
 
@@ -101,7 +101,10 @@ void	IOMultiplexing::_eraseMMAndCloseFd(int accepted_socket, fd_set *fds)
 	IOMultiplexing::_decrementMaxDescripotor(accepted_socket);
 	utils::x_close(accepted_socket);
 	if (METHOD_P)
+	{
 		delete METHOD_P;
+		METHOD_P = NULL;
+	}
 	this->_fd_MessageManagement.erase(accepted_socket);
 }
 
@@ -321,10 +324,6 @@ void	IOMultiplexing::_writeCGI(int write_fd) //　エラーの場合、レスポ
 
 void	IOMultiplexing::_closeNotListeningSockets()
 {
-	++this->_no_ready_count;
-	if (this->_no_ready_count < NO_READY_COUNT_LIMIT)
-		return;
-	this->_no_ready_count = 0;
 	for (int fd = 0; fd < this->_max_descripotor; fd++)
 	{
 		if (IOMultiplexing::_containsListeningSocket(fd))
@@ -361,7 +360,6 @@ void	IOMultiplexing::IOMultiplexingLoop()
 			utils::exitWithPutError("select() failed");
 		else
 		{
-			this->_no_ready_count = 0;
 			for (int fd = 0; fd < this->_max_descripotor + 1; fd++)
 			{
 				if (FD_ISSET(fd, &this->_writefds))
