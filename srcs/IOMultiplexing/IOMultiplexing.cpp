@@ -141,11 +141,11 @@ void	IOMultiplexing::_sendResponse(int accepted_socket)
 		debug(RESPONSE_MESSAGE);
 		debug("---------------------------------------------");
 
-		if (METHOD_P->connection.getValue() == CONNECTION_CLOSE)
+		if (DEQ_RESPONSE_MESSAGE[0].connection_flg == CONNECTION_CLOSE)
 		{
 			IOMultiplexing::_eraseMMAndCloseFd(accepted_socket, &this->_master_writefds);
 		}
-		else if (METHOD_P->connection.getValue() == CONNECTION_KEEP_ALIVE)
+		else if (DEQ_RESPONSE_MESSAGE[0].connection_flg == CONNECTION_KEEP_ALIVE)
 		{
 			IOMultiplexing::_switchToRecvRequest(accepted_socket);
 		}

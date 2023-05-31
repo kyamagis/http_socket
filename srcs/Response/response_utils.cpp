@@ -47,7 +47,6 @@ namespace response_utils
 		{
 			return "\r\n";
 		}
-
 		if (utils::contentEachExtension(file_path, ".jpg"))
 		{
 			response_message = "Content-Type: image/jpg\r\n";
