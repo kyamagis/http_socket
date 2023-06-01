@@ -108,6 +108,7 @@ int MessageManagement::storeMethodToDeq()
 		return 200;
 	}
 	this->method_p = new ErrorRequest(*this, 405);
+
 	return 405;
 }
 
@@ -120,7 +121,16 @@ int	MessageManagement::makeResponseMessage(t_response_message &response_message,
 
 	response_message.connection_flg = CONNECTION_CLOSE;
 
-	int		local_status_code = MessageManagement::storeMethodToDeq();
+	int	local_status_code;
+
+	try {
+		local_status_code = MessageManagement::storeMethodToDeq();
+	}
+	catch (std::bad_alloc &err) {
+		std::cerr << err.what() << std::endl;
+		local_status_code = 500;
+		this->method_p = NULL;
+	}
 
 	if (local_status_code == 200)
 	{
