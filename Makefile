@@ -1,5 +1,5 @@
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic #-fsanitize=address
 
 INCLUDES = -I ./includes
 
