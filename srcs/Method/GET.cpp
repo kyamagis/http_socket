@@ -90,7 +90,7 @@ int GET::_dealWithIndexAndAutoindex(str_ &contents_path)
 {
 	if (method_utils::isAtStrLast(this->uri, "/") == false)
 		return CONTINUE;
-	int status_code = 404;
+	int status_code = 200;
 	if (this->uri == this->_location.path.getValue())
 		status_code = Method::joinIndex(contents_path);
 	else if (this->_location.autoindex.getValue() == true)
