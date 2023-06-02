@@ -37,21 +37,6 @@ MessageManagement &MessageManagement::operator=(const MessageManagement &rhs)
 	return *this;
 }
 
-uint16_t	getPortFromAcceptedSocket(int accepted_socket)
-{
-	struct sockaddr_in	addr;
-    socklen_t			addr_len = sizeof(addr);
-
-	std::memset(&addr, 0, sizeof(sockaddr));
-	if (getsockname(accepted_socket, (struct sockaddr *)&addr, &addr_len) == -1)
-	{
-		utils::putError("getsockname() faile");
-		return (ntohs(80));
-	}
-	return ntohs(addr.sin_port);
-}
-
-
 /* 
 	ポート番号とホスト名が一致したサーバーを返す。
 	ポート番号が一致するが、ホスト名が一致しない場合、
@@ -60,7 +45,7 @@ uint16_t	getPortFromAcceptedSocket(int accepted_socket)
 
 void	MessageManagement::searchServer(int accepted_socket, const vec_sever_ &servers)
 {
-	uint16_t	accepted_socket_port = getPortFromAcceptedSocket(accepted_socket);
+	uint16_t	accepted_socket_port = mm_utils::getPortFromAcceptedSocket(accepted_socket);
 	size_t		maching_server_idx = 0;
 	bool		first_flg = false;
 
