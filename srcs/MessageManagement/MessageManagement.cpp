@@ -195,6 +195,11 @@ int		MessageManagement::writeCGIRequest(t_response_message &response_message)
 	return status;
 }
 
+bool	MessageManagement::parseRequstMessage()
+{
+	return Request::parseRequstMessage(this->server);
+}
+
 std::ostream &operator<<(std::ostream &ostrm, const MessageManagement &req)
 {
 	ostrm << "++++++++++++++++++++++++++++++++++" << std::endl;

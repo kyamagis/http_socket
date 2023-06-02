@@ -12,6 +12,7 @@ Method::~Method()
 }
 
 Method::Method(const Request &r):
+	_location(r.location),
 	method(r.method),
 	uri(r.uri),
 	version(r.version),
@@ -71,27 +72,6 @@ bool	Method::isBackSlashAtPathAndRootLast()
 	return true;
 }
 
-int	Method::setLocation(const Server& server)
-{
-	std::vector<Location>	locations = server.locations.getValue();
-	size_t					size = locations.size();
-	str_					location_path;
-	size_t					location_length;
-	size_t					matching_location_length = 0;
-
-	for (size_t i = 0; i < size; i++) {
-		location_path = locations[i].path.getValue();
-		if (this->uri.find(location_path) != 0)
-			continue ;
-		location_length = location_path.length();
-		if (matching_location_length <= location_length) {
-			this->_location = locations[i];
-			matching_location_length = location_length;
-		}
-	}
-	return 200;
-}
-
 int	Method::handleLocationRedirect()
 {
 	if (this->_location.return_info.getStatus() != NOT_SET)
@@ -110,9 +90,6 @@ int	Method::handleLocation(const Server& server)
 
 	this->server_name = server.server_name.getValue();
 	this->request_port = server.listen_port.getValue();
-	status_code = Method::setLocation(server);
-	if (status_code != 200)
-		return status_code;
 	status_code = Method::handleLocationRedirect();
 	if (status_code != 200)
 		return status_code;

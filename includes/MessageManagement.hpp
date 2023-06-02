@@ -60,6 +60,7 @@ class MessageManagement: public Request, public Response
 		int 	storeMethodToDeq();
 		int		readCGIResponse(t_response_message &response_message);
 		int		writeCGIRequest(t_response_message &response_message);
+		bool	parseRequstMessage();
 };
 
 std::ostream& operator<<(std::ostream &ostrm, const MessageManagement &tra);

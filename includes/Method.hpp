@@ -68,7 +68,6 @@ class Method
 		str_	makeContentsPath(const Server& server);
 		int		joinIndex(str_& contents_path);
 		bool	isBackSlashAtPathAndRootLast();
-		int		setLocation(const Server& server);
 
 		Value<str_>		getResponse_entity_body();
 		Value<str_>		getResponse_redirect_uri();
