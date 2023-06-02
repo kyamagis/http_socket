@@ -35,7 +35,7 @@ test: all
 	./webserv config/default.conf
 
 cgi: all
-	./webserv config/cgi.conf ; rm ./contents/cgi_files/*.txt
+	./webserv config/cgi.conf
 	
 
 .PHONY: all clean fclean re test cgi

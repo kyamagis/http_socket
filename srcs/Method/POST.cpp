@@ -42,7 +42,7 @@ int	POST::_startCGI(const str_ &contents_path, int max_descripotor)
 	{
 		return 500; //適当
 	}
-	this->cgi.setCGI("POST", CGI_PATH, Method::setEnv(contents_path), contents_path, this->request_entity_body);
+	this->cgi.setCGI("POST", CGI_PATH, Method::setEnv(contents_path), this->_contents_path, this->request_entity_body);
 	this->_contents_path = contents_path;
 	return this->cgi.startCGI();
 }
@@ -61,7 +61,7 @@ int	POST::endCGI()
 		file_name = method_utils::createUniqueFileName(contents_directory_path, CGI_CONTENT_TYPE);
 	}
 	else
-		file_name = this->_upload_path.getValue();
+		file_name = method_utils::createUniqueFileName(this->_upload_path.getValue(), CGI_CONTENT_TYPE);
 
 	return method_utils::makeAndPutFile(cgi.getCGIExecResult(), file_name);
 }

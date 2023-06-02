@@ -119,16 +119,43 @@ void	IOMultiplexing::_switchToRecvRequest(int accepted_socket)
 	this->_fd_MessageManagement.insert(std::pair<int, MessageManagement>(accepted_socket, MessageManagement()));
 }
 
+void	IOMultiplexing::_switchToSendResponse(int accepted_socket, const t_response_message &response_message)
+{
+	int	fd = accepted_socket;
+
+	DEQ_RESPONSE_MESSAGE.push_back(response_message);
+	ATTRIBUTION = NOT_CGI;
+	INIT_REQUEST_CLASS;
+}
+
+void	IOMultiplexing::_switchToReadCGIResponse(int accepted_socket)
+{
+	int	fd = accepted_socket;
+
+	FD_SET(READ_FD, &this->_master_readfds);
+	ATTRIBUTION = READ_CGI;
+	this->_pipefd_fd[READ_FD] = accepted_socket;
+	if (this->_max_descripotor < READ_FD)
+		this->_max_descripotor = READ_FD;
+}
+
+void	IOMultiplexing::_switchToWriteCGI(int accepted_socket)
+{
+	int	fd = accepted_socket;
+
+	FD_SET(WRITE_FD, &this->_master_writefds);
+	ATTRIBUTION = WRITE_CGI;
+	this->_pipefd_fd[WRITE_FD] = accepted_socket;
+	if (this->_max_descripotor < WRITE_FD)
+		this->_max_descripotor = WRITE_FD;
+}
+
 void	IOMultiplexing::_sendResponse(int accepted_socket)
 {
 	if (DEQ_RESPONSE_MESSAGE.size() == 0)
 		return ;
 	ssize_t	sent_len = send(accepted_socket, RESPONSE_MESSAGE.c_str(), RESPONSE_MESSAGE.size(), MSG_DONTWAIT);
 
-	if (sent_len == -1 && errno != EWOULDBLOCK)
-	{
-		utils::exitWithPutError("send() failed");
-	}
 	if (sent_len < 1)
 	{
 		debug("client closed socket");
@@ -136,10 +163,10 @@ void	IOMultiplexing::_sendResponse(int accepted_socket)
 	}
 	else if (RESPONSE_MESSAGE.size() == (size_t)sent_len)
 	{
-		debug("---------------------------------------------");
-		debug(accepted_socket);
-		debug(RESPONSE_MESSAGE);
-		debug("---------------------------------------------");
+		std::cout << "---------------------------------------------" << std::endl
+		<< "accepted_socket = " << accepted_socket << std::endl
+		<< RESPONSE_MESSAGE 
+		<< "---------------------------------------------" << std::endl;
 
 		if (DEQ_RESPONSE_MESSAGE[0].connection_flg == CONNECTION_CLOSE)
 		{
@@ -148,12 +175,15 @@ void	IOMultiplexing::_sendResponse(int accepted_socket)
 		else if (DEQ_RESPONSE_MESSAGE[0].connection_flg == CONNECTION_KEEP_ALIVE)
 		{
 			IOMultiplexing::_switchToRecvRequest(accepted_socket);
+			
 		}
 	}
 	else if ((size_t)sent_len < RESPONSE_MESSAGE.size())
 	{
 		RESPONSE_MESSAGE = RESPONSE_MESSAGE.substr(sent_len);
+		
 	}
+
 }
 
 bool	IOMultiplexing::_containsListeningSocket(int fd)
@@ -189,36 +219,6 @@ void	IOMultiplexing::_createAcceptedSocket(int listening_socket)
 	}
 }
 
-void	IOMultiplexing::_switchToSendResponse(int accepted_socket, const t_response_message &response_message)
-{
-	int	fd = accepted_socket;
-
-	DEQ_RESPONSE_MESSAGE.push_back(response_message);
-	ATTRIBUTION = NOT_CGI;
-	INIT_REQUEST_CLASS;
-}
-
-void	IOMultiplexing::_switchToReadCGIResponse(int accepted_socket)
-{
-	int	fd = accepted_socket;
-
-	FD_SET(READ_FD, &this->_master_readfds);
-	ATTRIBUTION = READ_CGI;
-	this->_pipefd_fd[READ_FD] = accepted_socket;
-	if (this->_max_descripotor < READ_FD)
-		this->_max_descripotor = READ_FD;
-}
-
-void	IOMultiplexing::_switchToWriteCGI(int accepted_socket)
-{
-	int	fd = accepted_socket;
-
-	FD_SET(WRITE_FD, &this->_master_writefds);
-	ATTRIBUTION = WRITE_CGI;
-	this->_pipefd_fd[WRITE_FD] = accepted_socket;
-	if (this->_max_descripotor < WRITE_FD)
-		this->_max_descripotor = WRITE_FD;
-}
 
 /* 基底回数以上になったら、閉じる動作を入れる */
 void	IOMultiplexing::_recvRequest(int fd)
@@ -240,6 +240,7 @@ void	IOMultiplexing::_recvRequest(int fd)
 		return ;
 	}
 	t_response_message	response_message;
+	response_message.connection_flg = CONNECTION_CLOSE;
 
 	this->_fd_MessageManagement[accepted_socket].MessageManagement::searchServer(accepted_socket, this->_servers);
 	FD_CLR(accepted_socket, &this->_master_readfds);
@@ -294,6 +295,7 @@ void	IOMultiplexing::_readCGIResponse(int read_fd)
 {
 	int	accepted_socket = this->_pipefd_fd[read_fd];
 	t_response_message	response_message;
+	response_message.connection_flg = CONNECTION_CLOSE;
 	
 	if (this->_fd_MessageManagement[accepted_socket].readCGIResponse(response_message) == CONTINUE)
 	{
@@ -310,6 +312,7 @@ void	IOMultiplexing::_writeCGI(int write_fd) //　エラーの場合、レスポ
 {
 	int	accepted_socket = this->_pipefd_fd[write_fd];
 	t_response_message	response_message;
+	response_message.connection_flg = CONNECTION_CLOSE;
 	int	status = this->_fd_MessageManagement[accepted_socket].writeCGIRequest(response_message);
 
 	if (status == CONTINUE)
@@ -380,8 +383,8 @@ void	IOMultiplexing::IOMultiplexingLoop()
 					else if (ATTRIBUTION == NOT_CGI)
 					{
 						IOMultiplexing::_sendResponse(fd);
-						std::cout << "accepted_socket: " << fd << ", max_descripotor: " 
-								<< this->_max_descripotor << std::endl;
+						// std::cout << "accepted_socket: " << fd << ", max_descripotor: " 
+						// 		<< this->_max_descripotor << std::endl;
 					}
 				}
 				else if (FD_ISSET(fd, &this->_readfds))

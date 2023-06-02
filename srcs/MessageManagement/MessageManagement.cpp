@@ -119,8 +119,6 @@ int	MessageManagement::makeResponseMessage(t_response_message &response_message,
 	// これを実行すると、waitpid()からexecve()の失敗を検知できない。それでもいいのか？
 	// signal(SIGCHLD, SIG_IGN);
 
-	response_message.connection_flg = CONNECTION_CLOSE;
-
 	int	local_status_code;
 
 	try {
@@ -165,18 +163,20 @@ int	MessageManagement::makeResponseMessage(t_response_message &response_message,
 int		MessageManagement::readCGIResponse(t_response_message &response_message)
 {
 	int status = this->method_p->cgi.readAndWaitpid();
-	if (status == 500)
-	{
-		response_message.response_message = Response::errorResponseMessage(500, this->server);
-		return END;
-	}
-	else if (status == 200 || status == CONTINUE)
+	
+	if (status == CONTINUE)
 	{
 		return CONTINUE;
 	}
-	else // (status == END)
+	else if (status == END)
 	{
-		this->method_p->endCGI();
+		status = this->method_p->endCGI();
+		if (status != 200)
+		{
+			response_message.response_message = Response::errorResponseMessage(status, this->server);
+			return END;
+		}
+
 		if (this->method_p->connection.getValue() == CONNECTION_KEEP_ALIVE)
 			response_message.connection_flg = CONNECTION_KEEP_ALIVE;
 		response_message.response_message = Response::okResponseMessage(200,
@@ -184,27 +184,30 @@ int		MessageManagement::readCGIResponse(t_response_message &response_message)
 																	 this->method_p->getContentType(),
 																	 this->method_p->connection,
 																	this->server);
+		
 		return END;
 	}
+	// status がエラーだった場合
+	response_message.response_message = Response::errorResponseMessage(status, this->server);
+	return END;
 }
 
 int		MessageManagement::writeCGIRequest(t_response_message &response_message)
 {
 	int	status = this->method_p->cgi.writeRequestEntityBodyToCGI();
 
-	if (status == 500)
-	{
-		response_message.response_message = Response::errorResponseMessage(500, this->server);
-		return 500;
-	}
-	else if (status == CONTINUE)
+	if (status == CONTINUE)
 	{
 		return CONTINUE;
 	}
-	else// (status == END)
+	else if (status == END)
 	{
 		return END;
 	}
+
+	// status がエラーだった場合
+	response_message.response_message = Response::errorResponseMessage(status, this->server);
+	return status;
 }
 
 std::ostream &operator<<(std::ostream &ostrm, const MessageManagement &req)
