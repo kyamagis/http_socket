@@ -23,8 +23,14 @@ int	DELETE::_joinIndex(str_ &contents_path)
 int	DELETE::_deleteFileOrDirectory(const str_ &contents_path)
 {
 	if (access(contents_path.c_str(), F_OK) == NOT_FOUND)
+	{
 		return 404;
-	if (std::remove(contents_path.c_str()) == -1)
+	}
+	if (access(contents_path.c_str(), R_OK) == NOT_FOUND)
+	{
+		return 403;
+	}
+	if (std::remove(method_utils::eraseHeadDot(contents_path).c_str()) == -1)// std::remove の機能的にディレクトリは削除できない
 	{
 		return 403;
 	}
