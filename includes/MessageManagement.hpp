@@ -16,6 +16,7 @@
 #include "./ErrorRequest.hpp"
 #include "./Request.hpp"
 #include "./Response.hpp"
+#include "./mm_utils.hpp"
 
 #define deq_Method_ std::deque<Method>
 #define deq_res_ std::deque<Method>

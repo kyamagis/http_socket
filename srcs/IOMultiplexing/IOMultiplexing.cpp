@@ -75,11 +75,11 @@ void IOMultiplexing::_initMasterReadfds()
 	this->_max_descripotor = 0;
 
 	FD_ZERO(&this->_master_readfds);
-	for (size_t i = 0; i < _vec_listening_socket.size(); i++)
+	for (size_t i = 0; i < this->_vec_listening_socket.size(); i++)
 	{
-		FD_SET(_vec_listening_socket[i], &this->_master_readfds);
-		if (this->_max_descripotor < _vec_listening_socket[i])
-			this->_max_descripotor = _vec_listening_socket[i];
+		FD_SET(this->_vec_listening_socket[i], &this->_master_readfds);
+		if (this->_max_descripotor < this->_vec_listening_socket[i])
+			this->_max_descripotor = this->_vec_listening_socket[i];
 	}
 }
 
@@ -205,10 +205,10 @@ void	IOMultiplexing::_createAcceptedSocket(int listening_socket)
 		accepted_socket = accept(listening_socket, NULL, NULL);
 		if (accepted_socket == -1)
 		{
-			if (errno != EWOULDBLOCK)
+			/* if (errno != EWOULDBLOCK)
 			{
 				utils::exitWithPutError("accept() failed");
-			}
+			} */
 			debug("accept() == -1");
 			return ;
 		}
@@ -359,13 +359,12 @@ void	IOMultiplexing::IOMultiplexingLoop()
 	while(true)
 	{
 		std::memcpy(&this->_writefds, &this->_master_writefds, sizeof(this->_master_writefds));
-		std::memcpy(&this->_readfds, &this->_master_readfds, sizeof(_master_readfds));
+		std::memcpy(&this->_readfds, &this->_master_readfds, sizeof(this->_master_readfds));
 		this->_timeout.tv_sec = 60;
 		this->_timeout.tv_usec = 0;
 		ready = select(this->_max_descripotor + 1, &this->_readfds, &this->_writefds, NULL, &this->_timeout);
 		if (ready == 0)
 		{
-			//continue;
 			IOMultiplexing::_closeNotListeningSockets();
 		}
 		else if (ready == -1)
@@ -383,8 +382,8 @@ void	IOMultiplexing::IOMultiplexingLoop()
 					else if (ATTRIBUTION == NOT_CGI)
 					{
 						IOMultiplexing::_sendResponse(fd);
-						// std::cout << "accepted_socket: " << fd << ", max_descripotor: " 
-						// 		<< this->_max_descripotor << std::endl;
+						std::cout << "accepted_socket: " << fd << ", max_descripotor: " 
+								<< this->_max_descripotor << std::endl;
 					}
 				}
 				else if (FD_ISSET(fd, &this->_readfds))

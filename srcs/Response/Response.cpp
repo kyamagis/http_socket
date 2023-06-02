@@ -51,13 +51,6 @@ str_	Response::_searchErrorPage(const int status_code, const Server &server)
 	return response_message;
 }
 
-// str_	Response::addAllowHeader()
-// {
-// 	str_	response_messagest = "Allow: ";
-
-// 	if (this->_server.locations[0])
-// }
-
 str_	Response::_commonResponseMessage(const int status_code, const Server &server)
 {
 	str_	response_message;
