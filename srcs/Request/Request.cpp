@@ -461,7 +461,7 @@ bool	Request::parseRequstMessage(const Server &server)
 
 	if (this->request_phase == RECV_ENTITY_BODY)
 	{
-		if (this->_parseRequestEntityBody() == END) //error あるいは、このrecvで期待しているバイト数を得られた場合
+		if (Request::_parseRequestEntityBody() == END) //error あるいは、このrecvで期待しているバイト数を得られた場合
 		{
 			this->request_phase = RECV_REQUEST;
 			return END;
@@ -469,12 +469,11 @@ bool	Request::parseRequstMessage(const Server &server)
 	}
 	else if  (entity_body_pos != str_::npos)//エンティティボディの検知
 	{
-		
-		if (_parseRequestLineAndHeaders(entity_body_pos, server) == END) // content-length, transfer-encoding が存在しない場合
+		if (Request::_parseRequestLineAndHeaders(entity_body_pos, server) == END) // content-length, transfer-encoding が存在しない場合
 		{
 			return END;
 		}
-		if (this->_parseRequestEntityBody() == END) //error あるいは、このrecvで期待しているバイト数を得られた場合
+		if (Request::_parseRequestEntityBody() == END) //error あるいは、このrecvで期待しているバイト数を得られた場合
 		{
 			return END;
 		}

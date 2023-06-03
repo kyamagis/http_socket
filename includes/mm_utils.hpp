@@ -15,4 +15,5 @@ namespace mm_utils
 {
 	uint16_t	getPortFromAcceptedSocket(int accepted_socket);
 }
+
 #endif
