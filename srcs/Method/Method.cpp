@@ -86,11 +86,9 @@ int	Method::handleLocationRedirect()
 
 int	Method::handleLocation(const Server& server)
 {
-	int	status_code;
-
 	this->server_name = server.server_name.getValue();
 	this->request_port = server.listen_port.getValue();
-	status_code = Method::handleLocationRedirect();
+	int	status_code = Method::handleLocationRedirect();
 	if (status_code != 200)
 		return status_code;
 	return 200;
