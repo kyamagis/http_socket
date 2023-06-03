@@ -77,6 +77,7 @@ namespace response_utils
 		map_status[403] = "403 Forbidden\r\n";
 		map_status[404] = "404 Not Found\r\n";
 		map_status[405] = "405 Method Not Allowed\r\n";
+		map_status[413] = "413 Payload Too Large\r\n";
 		map_status[415] = "415 Unsupported Media Type\r\n";
 		map_status[500] = "500 Internal Server Error\r\n";
 		map_status[501] = "501 Not Implemented\r\n";

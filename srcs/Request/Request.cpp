@@ -19,6 +19,7 @@ Request &Request::operator=(const Request &rhs)
 	if (this != &rhs)
 	{
 		this->request_phase = rhs.request_phase;
+		this->location = rhs.location;
 
 		this->status_code = rhs.status_code;
 		this->request_message = rhs.request_message;
@@ -282,8 +283,28 @@ void	Request::_parseHeaders(const vec_str_ &request_headers)
 	}
 }
 
+int	Request::_setLocation(const Server& server)
+{
+	std::vector<Location>	locations = server.locations.getValue();
+	size_t					size = locations.size();
+	str_					location_path;
+	size_t					location_length;
+	size_t					matching_location_length = 0;
 
-bool	Request::_parseRequestLineAndHeaders(size_t entity_body_pos)
+	for (size_t i = 0; i < size; i++) {
+		location_path = locations[i].path.getValue();
+		if (this->uri.find(location_path) != 0)
+			continue ;
+		location_length = location_path.length();
+		if (matching_location_length <= location_length) {
+			this->location = locations[i];
+			matching_location_length = location_length;
+		}
+	}
+	return 200;
+}
+
+bool	Request::_parseRequestLineAndHeaders(size_t entity_body_pos, const Server &server)
 {
 	vec_str_	vec_splite_request = Request::_spliteRequestLineAndHeader(entity_body_pos + 2);
 	if (vec_splite_request.size() < 2)
@@ -300,6 +321,7 @@ bool	Request::_parseRequestLineAndHeaders(size_t entity_body_pos)
 	if (this->status_code == 200)
 		Request::_parseHost(vec_splite_request[1]);
 	Request::_parseHeaders(vec_splite_request);
+	Request::_setLocation(server);
 	if (this->content_length.getStatus() == NOT_SET && \
 		this->transfer_encoding.getStatus() == NOT_SET)
 	{
@@ -320,6 +342,11 @@ int	Request::_storeChunkedStr()
 	}
 	this->chunked_size -= substr_len;
 	this->request_entity_body += this->request_message.substr(0, substr_len);
+	if (this->location.client_max_body_size.getValue() < this->request_entity_body.size())
+	{
+		this->status_code = 413;
+		return END;
+	}
 	this->request_message = this->request_message.substr(substr_len);
 	if (this->chunked_size == 0)
 	{
@@ -394,6 +421,11 @@ bool	Request::_storeEntityBodyChunked()
 bool Request::_storeEntityBodyContentLength()
 {
 	this->request_entity_body += this->request_message.substr(0, this->content_length.getValue());
+	if (this->location.client_max_body_size.getValue() < this->request_entity_body.size())
+	{
+		this->status_code = 413;
+		return END;
+	}
 	if (this->request_message.size() < this->content_length.getValue())
 	{
 		this->request_message.clear();
@@ -402,7 +434,6 @@ bool Request::_storeEntityBodyContentLength()
 	{
 		this->request_message = this->request_message.substr(this->content_length.getValue());
 	}
-	
 	if (this->request_entity_body.size() < this->content_length.getValue())
 	{
 		this->content_length.setValue(this->content_length.getValue() - this->request_entity_body.size());
@@ -424,7 +455,7 @@ bool	Request::_parseRequestEntityBody()
 	return END;
 }
 
-bool	Request::parseRequstMessage()
+bool	Request::parseRequstMessage(const Server &server)
 {
 	size_t	entity_body_pos = this->request_message.find("\r\n\r\n");
 
@@ -439,7 +470,7 @@ bool	Request::parseRequstMessage()
 	else if  (entity_body_pos != str_::npos)//エンティティボディの検知
 	{
 		
-		if (_parseRequestLineAndHeaders(entity_body_pos) == END) // content-length, transfer-encoding が存在しない場合
+		if (_parseRequestLineAndHeaders(entity_body_pos, server) == END) // content-length, transfer-encoding が存在しない場合
 		{
 			return END;
 		}

@@ -213,6 +213,7 @@ void	IOMultiplexing::_createAcceptedSocket(int listening_socket)
 			return ;
 		}
 		this->_fd_MessageManagement.insert(std::pair<int, MessageManagement>(accepted_socket, MessageManagement()));
+		this->_fd_MessageManagement[accepted_socket].MessageManagement::searchServer(accepted_socket, this->_servers);
 		FD_SET(accepted_socket, &this->_master_readfds);
 		if (this->_max_descripotor < accepted_socket)
 			this->_max_descripotor = accepted_socket;
@@ -242,7 +243,6 @@ void	IOMultiplexing::_recvRequest(int fd)
 	t_response_message	response_message;
 	response_message.connection_flg = CONNECTION_CLOSE;
 
-	this->_fd_MessageManagement[accepted_socket].MessageManagement::searchServer(accepted_socket, this->_servers);
 	FD_CLR(accepted_socket, &this->_master_readfds);
 	FD_SET(accepted_socket, &this->_master_writefds);
 	int	cgi_flg = MAKE_RESPONSE_MESSAGE;

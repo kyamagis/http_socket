@@ -11,6 +11,7 @@
 #include "./utils.hpp"
 #include "./request_utils.hpp"
 #include "./RValue.hpp"
+#include "./Server.hpp"
 
 #define CONNECTION_CLOSE 0
 #define CONNECTION_KEEP_ALIVE 1
@@ -40,12 +41,15 @@ class Request
 		void		_parseHost(const str_ &host_header);
 		void		_parseHeaders(const vec_str_ &request_headers);
 		vec_str_	_spliteRequestLineAndHeader(size_t entity_body_pos);
-		bool		_parseRequestLineAndHeaders(size_t entity_body_pos);
+
+		int			_setLocation(const Server& server);
+		bool		_parseRequestLineAndHeaders(size_t entity_body_pos, const Server &server);
 		
 	public:
 
 		enum e_request_phase	request_phase;
-
+		Location				location;
+	
 		int			status_code;
 		str_		request_message;
 		str_		method;
@@ -71,7 +75,7 @@ class Request
 
 		void	initResponseClass();
 
-		bool		parseRequstMessage();
+		bool	parseRequstMessage(const Server	&server);
 
 
 };
