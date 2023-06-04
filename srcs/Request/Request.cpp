@@ -292,6 +292,7 @@ int	Request::_setLocation(const Server& server)
 	size_t					matching_location_length = 0;
 
 	for (size_t i = 0; i < size; i++) {
+		
 		location_path = locations[i].path.getValue();
 		if (this->uri.find(location_path) != 0)
 			continue ;
@@ -301,7 +302,6 @@ int	Request::_setLocation(const Server& server)
 			matching_location_length = location_length;
 		}
 	}
-	
 	return 200;
 }
 

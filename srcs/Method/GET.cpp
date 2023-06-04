@@ -16,9 +16,9 @@ int GET::_readFileContents(const str_ &contents_path)
 
 	if (method_utils::isAtStrLast(contents_path, "/"))
 		return 404;
-	if (access(method_utils::eraseHeadDot(contents_path).c_str(), F_OK) == NOT_FOUND)
+	if (access(contents_path.c_str(), F_OK) == NOT_FOUND)
 		return 404;
-	if (access(method_utils::eraseHeadDot(contents_path).c_str(), R_OK) == NOT_FOUND)
+	if (access(contents_path.c_str(), R_OK) == NOT_FOUND)
 		return 403;
 	ifs.open(contents_path.c_str());
 	if (!ifs || !ifs.is_open())
@@ -92,7 +92,9 @@ int GET::_dealWithIndexAndAutoindex(str_ &contents_path)
 		return CONTINUE;
 	int status_code = 200;
 	if (this->uri == this->_location.path.getValue())
+	{
 		status_code = Method::joinIndex(contents_path);
+	}
 	else if (this->_location.autoindex.getValue() == true)
 		return GET::_exeAutoindex(contents_path);
 	if (status_code != 200 && this->_location.autoindex.getValue() == true)
@@ -111,7 +113,9 @@ int GET::exeMethod(const Server &server, int max_descripotor)
 
 	status_code = Method::handleLocation(server);
 	if (status_code != 200)
+	{
 		return status_code;
+	}
 	if (this->_location.method_get.getValue() == false)
 		return 405;
 	contents_path = Method::makeContentsPath(server);
