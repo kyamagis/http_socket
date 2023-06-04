@@ -32,7 +32,6 @@ MessageManagement &MessageManagement::operator=(const MessageManagement &rhs)
 		this->parent_fd       = rhs.parent_fd;
 		this->request_phase   = rhs.request_phase;
 		this->request_message = rhs.request_message;
-		
 	}
 	return *this;
 }
@@ -51,7 +50,6 @@ void	MessageManagement::searchServer(int accepted_socket, const vec_sever_ &serv
 
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		
 		if (accepted_socket_port == servers[i].listen_port.getValue())
 		{
 			if (first_flg == false)

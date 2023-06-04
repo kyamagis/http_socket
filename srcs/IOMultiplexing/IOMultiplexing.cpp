@@ -117,6 +117,7 @@ void	IOMultiplexing::_switchToRecvRequest(int accepted_socket)
 	}
 	this->_fd_MessageManagement.erase(accepted_socket);
 	this->_fd_MessageManagement.insert(std::pair<int, MessageManagement>(accepted_socket, MessageManagement()));
+	this->_fd_MessageManagement[accepted_socket].MessageManagement::searchServer(accepted_socket, this->_servers);
 }
 
 void	IOMultiplexing::_switchToSendResponse(int accepted_socket, const t_response_message &response_message)
@@ -173,7 +174,6 @@ void	IOMultiplexing::_createAcceptedSocket(int listening_socket)
 			{
 				utils::exitWithPutError("accept() failed");
 			} */
-			debug("accept() == -1");
 			return ;
 		}
 		this->_fd_MessageManagement.insert(std::pair<int, MessageManagement>(accepted_socket, MessageManagement()));
@@ -181,6 +181,7 @@ void	IOMultiplexing::_createAcceptedSocket(int listening_socket)
 		FD_SET(accepted_socket, &this->_master_readfds);
 		if (this->_max_descripotor < accepted_socket)
 			this->_max_descripotor = accepted_socket;
+		std::cout << "accepted_socket: " << accepted_socket << std::endl;
 	}
 }
 
