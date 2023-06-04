@@ -301,6 +301,7 @@ int	Request::_setLocation(const Server& server)
 			matching_location_length = location_length;
 		}
 	}
+	
 	return 200;
 }
 
