@@ -251,7 +251,6 @@ void	IOMultiplexing::_sendResponse(int accepted_socket)
 	}
 	else if (RESPONSE_MESSAGE.size() == (size_t)sent_len)
 	{
-		debug(this->_fd_MessageManagement[accepted_socket]);
 		std::cout << "---------------------------------------------" << std::endl
 		<< "accepted_socket = " << accepted_socket << std::endl
 		<< RESPONSE_MESSAGE 
@@ -310,7 +309,7 @@ void	IOMultiplexing::_recvRequest(int fd)
 	}
 	t_response_message	response_message;
 	response_message.connection_flg = CONNECTION_CLOSE;
-
+	debug(this->_fd_MessageManagement[accepted_socket]);
 	FD_CLR(accepted_socket, &this->_master_readfds);
 	FD_SET(accepted_socket, &this->_master_writefds);
 	int	cgi_flg = MAKE_RESPONSE_MESSAGE;
