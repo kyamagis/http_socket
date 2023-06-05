@@ -19,7 +19,6 @@ namespace method_utils
 {
 	bool		isAtStrLast(const str_& str, const str_& to_find);
 	str_		createUniqueFileName(const str_ &file_path, const str_& content_type);
-	str_		eraseHeadDot(const str_ &str);
 	int			overwriteFile(const str_ &file_content, const str_ &file_name);
 	int			makeAndPutFile(const str_ &file_content, const str_ &file_name);
 	str_		discriminateExtension(const str_& contents_path);
