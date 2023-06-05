@@ -35,7 +35,7 @@ namespace method_utils
 		str_ date;
 
 		date = utils::intToStr(gmt->tm_year + 1900) + "_" + 
-				utils::intToStr(gmt->tm_mon) + "_" + 
+				utils::intToStr(gmt->tm_mon + 1) + "_" + 
 				utils::intToStr(gmt->tm_mday) + "_" + 
 				utils::intToStr(gmt->tm_hour) + ':' + 
 				utils::intToStr(gmt->tm_min) + ':' + 
