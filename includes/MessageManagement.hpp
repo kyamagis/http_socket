@@ -55,6 +55,7 @@ class MessageManagement: public Request, public Response
 		MessageManagement &operator=(const MessageManagement &rhs);
 		~MessageManagement();
 
+		void	setDefaultServer(const vec_sever_ &servers);
 		int		makeResponseMessage(t_response_message	&response_message, int max_descripotor);
 		int 	storeMethodToDeq();
 		int		readCGIResponse(t_response_message &response_message);

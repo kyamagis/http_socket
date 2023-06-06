@@ -1,9 +1,10 @@
 
 #include "../includes/utils.hpp"
 
+#include <ctime>
+
 #include <string.h>
 #include <fcntl.h>
-#include <ctime>
 
 #define vec_str_ std::vector<str_>
 

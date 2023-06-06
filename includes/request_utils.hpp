@@ -3,13 +3,11 @@
 # define request_utils_hpp
 
 #include <iostream>
-#include <cstring>
 #include <string>
 #include <vector>
 #include <map>
 
 #include <unistd.h>
-#include <arpa/inet.h>
 
 #include "./utils.hpp"
 
@@ -21,7 +19,6 @@ typedef	std::map<int, str_> map_month_ ;
 namespace request_utils
 {
 	size_t		hexStrToLL(const str_ &str, bool &over_flow);
-	uint16_t	getPortFromAcceptedSocket(int accepted_socket);
 }
 
 #endif

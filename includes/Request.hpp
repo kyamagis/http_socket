@@ -13,6 +13,8 @@
 #include "./RValue.hpp"
 #include "./Server.hpp"
 
+#include <arpa/inet.h>
+
 #define vec_sever_ std::vector<Server>
 
 #define CONNECTION_CLOSE 0
@@ -52,6 +54,7 @@ class Request
 
 		enum e_request_phase	request_phase;
 		int						accepted_socket;
+		uint16_t				accepted_socket_port;
 		Server					server;
 		Location				location;
 	
