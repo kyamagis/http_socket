@@ -11,14 +11,26 @@
 	<h1>webserv review </h1>
 	<h2>confファイル: conf/review.conf</h2>
 	<h2>GET</h2>
-	<form method="post" action="/">
-		<input type="text" name="textArea">
-		<input type="hidden" name="_method" value="DELETE"> <!-- この1行を追加！ -->
-		<input type="submit" value="delete!!">
-	</form>
+	<input type="text" id="deleteId" name="deletePath" value="">
+	<button onclick="deleteFile(document.getElementById('deleteId').value)">delete button</button>
 	<form method="post" action="/upload/">
 		<input type="text" name="hello">
 		<input type="submit" value="POST!!">
 	</form>
+	<script>
+		// function deleteFile(path){
+		// 	console.log(path);
+		// }
+		function deleteFile(path){
+			console.log('deleteFile')
+			console.log(path)
+		fetch(`http://localhost:8085/delete/${path}`, {
+		  method: 'DELETE',
+		})
+		.then(response => response.json())
+		.then(data => console.log(data))
+		.catch((error) => console.log('Error:', error))};
+
+	</script>
 </body>
 </html>
