@@ -18,10 +18,8 @@ typedef	std::vector<e_error_page>	vec_e_page_;
 class Response
 {
 	private:
-		//int				_fd;
 		str_		_getGMT();
 		str_		_searchErrorPage(const int status_code, const Server &server);
-		//str_		addAllowHeader();
 		str_		_commonResponseMessage(const int status_code, const Server &server);
 
 	public:

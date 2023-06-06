@@ -6,7 +6,7 @@
 #define MAKE_RESPONSE_MESSAGE this->_fd_MessageManagement[accepted_socket].makeResponseMessage(response_message, this->_max_descripotor)
 #define METHOD_P this->_fd_MessageManagement[accepted_socket].method_p
 #define REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].request_message
-#define PARSE_REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].parseRequstMessage()
+#define PARSE_REQUEST_MESSAGE this->_fd_MessageManagement[accepted_socket].parseRequstMessage(this->_servers)
 #define INIT_REQUEST_CLASS this->_fd_MessageManagement[accepted_socket].initResponseClass()
 #define ATTRIBUTION this->_fd_MessageManagement[fd].attribution
 
@@ -117,7 +117,8 @@ void	IOMultiplexing::_switchToRecvRequest(int accepted_socket)
 	}
 	this->_fd_MessageManagement.erase(accepted_socket);
 	this->_fd_MessageManagement.insert(std::pair<int, MessageManagement>(accepted_socket, MessageManagement()));
-	this->_fd_MessageManagement[accepted_socket].MessageManagement::searchServer(accepted_socket, this->_servers);
+	this->_fd_MessageManagement[accepted_socket].server = this->_servers[0];
+	this->_fd_MessageManagement[accepted_socket].accepted_socket = accepted_socket;
 }
 
 void	IOMultiplexing::_switchToSendResponse(int accepted_socket, const t_response_message &response_message)
@@ -177,7 +178,8 @@ void	IOMultiplexing::_createAcceptedSocket(int listening_socket)
 			return ;
 		}
 		this->_fd_MessageManagement.insert(std::pair<int, MessageManagement>(accepted_socket, MessageManagement()));
-		this->_fd_MessageManagement[accepted_socket].MessageManagement::searchServer(accepted_socket, this->_servers);
+		this->_fd_MessageManagement[accepted_socket].server = this->_servers[0];
+		this->_fd_MessageManagement[accepted_socket].accepted_socket = accepted_socket;
 		FD_SET(accepted_socket, &this->_master_readfds);
 		if (this->_max_descripotor < accepted_socket)
 			this->_max_descripotor = accepted_socket;
