@@ -102,13 +102,12 @@ void	Request::_parseRequestLine(const str_ &request_line)
 
 void	Request::_searchServer(const vec_sever_ &servers)
 {
-	uint16_t	accepted_socket_port = request_utils::getPortFromAcceptedSocket(this->accepted_socket);
 	size_t		maching_server_idx = 0;
 	bool		first_flg = false;
 
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		if (accepted_socket_port == servers[i].listen_port.getValue())
+		if (this->accepted_socket_port == servers[i].listen_port.getValue())
 		{
 			if (first_flg == false)
 			{

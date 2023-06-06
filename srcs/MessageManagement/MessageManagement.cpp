@@ -36,6 +36,22 @@ MessageManagement &MessageManagement::operator=(const MessageManagement &rhs)
 	return *this;
 }
 
+void	MessageManagement::setDefaultServer(const vec_sever_ &servers)
+{
+	this->accepted_socket_port = mm_utils::getPortFromAcceptedSocket(this->accepted_socket);
+
+	for (size_t i = 0; i < servers.size(); i++)
+	{
+		if (this->accepted_socket_port == servers[i].listen_port.getValue())
+		{
+			this->server = servers[i];
+			return ;
+		}
+	}
+	this->server = servers[0];
+	return ;
+}
+
 int MessageManagement::storeMethodToDeq()
 {
 	if (this->status_code != 200)
@@ -62,7 +78,6 @@ int MessageManagement::storeMethodToDeq()
 
 	return 405;
 }
-
 
 int	MessageManagement::makeResponseMessage(t_response_message &response_message, int max_descripotor)
 {
