@@ -190,8 +190,7 @@ ssize_t	CGI::_readExecResulet()
 			utils::putError("read() fail");
 			return -1;
 		} */
-		debug("read == -1");
-		return 0;
+		return read_len;
 	}
 	if (0 < read_len)
 	{
