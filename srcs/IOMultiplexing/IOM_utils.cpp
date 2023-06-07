@@ -128,11 +128,12 @@ namespace IOM_utils
 			{
 				utils::exitWithPutError("recv() failed");
 			} */
-			debug("recv == -1");
+			debug("recv(): client closed socket");
 			return -1;
 		}
 		if (recved_len == 0)
 		{
+			debug("recv(): EOF");
 			return 0;
 		}
 		return recved_len;

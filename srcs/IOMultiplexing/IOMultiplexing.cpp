@@ -270,7 +270,7 @@ void	IOMultiplexing::_createAcceptedSocket(int listening_socket)
 		FD_SET(accepted_socket, &this->_master_readfds);
 		if (this->_max_descripotor < accepted_socket)
 			this->_max_descripotor = accepted_socket;
-		std::cout << "accepted_socket: " << accepted_socket << std::endl;
+		std::cout << "createAcceptedSocket: " << accepted_socket << std::endl;
 	}
 }
 
@@ -300,7 +300,6 @@ void	IOMultiplexing::_recvRequest(int fd)
 
 	if (recved_len < 1)
 	{
-		debug("recv() < 1: client closed socket");
 		IOMultiplexing::_eraseMMAndCloseFd(accepted_socket, &this->_master_readfds);
 		std::cout << "accepted_socket: " << fd << ", max_descripotor: " 
 								<< this->_max_descripotor << std::endl;
