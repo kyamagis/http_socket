@@ -30,8 +30,10 @@ re: fclean all
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 
+review: all
+	./webserv config/review/review1.conf
 
-test: all
+default: all
 	./webserv config/default.conf
 
 cgi: all
