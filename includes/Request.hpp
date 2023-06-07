@@ -13,6 +13,10 @@
 #include "./RValue.hpp"
 #include "./Server.hpp"
 
+#include <arpa/inet.h>
+
+#define vec_sever_ std::vector<Server>
+
 #define CONNECTION_CLOSE 0
 #define CONNECTION_KEEP_ALIVE 1
 
@@ -38,16 +42,20 @@ class Request
 		void		_parseTransferEncoding(const vec_str_ &vec_split_a_header);
 		int			_parseMime(const str_ &lower_str, const vec_str_ &vec_split_a_header);
 		void		_parseContentType(const vec_str_ &vec_split_a_header);
-		void		_parseHost(const str_ &host_header);
+		void		_searchServer(const vec_sever_ &servers);
+		void		_parseHost(const str_ &host_header, const vec_sever_ &servers);
 		void		_parseHeaders(const vec_str_ &request_headers);
 		vec_str_	_spliteRequestLineAndHeader(size_t entity_body_pos);
 
 		int			_setLocation(const Server& server);
-		bool		_parseRequestLineAndHeaders(size_t entity_body_pos, const Server &server);
+		bool		_parseRequestLineAndHeaders(size_t entity_body_pos, const vec_sever_ &servers);
 		
 	public:
 
 		enum e_request_phase	request_phase;
+		int						accepted_socket;
+		uint16_t				accepted_socket_port;
+		Server					server;
 		Location				location;
 	
 		int			status_code;
@@ -75,7 +83,7 @@ class Request
 
 		void	initResponseClass();
 
-		bool	parseRequstMessage(const Server	&server);
+		bool	parseRequstMessage(const vec_sever_ &servers);
 
 
 };

@@ -14,7 +14,7 @@
 # include	<cstdlib>
 # include	<unistd.h>
 # include 	<strings.h>
-# include	"signal.h"
+# include	<signal.h>
 # include	<fcntl.h>
 # include	<sys/time.h>
 # include	<sys/types.h>
@@ -58,18 +58,18 @@ namespace utils
 	vec_str_	split_Str(const str_ &str, const str_ &delim);
 	vec_str_	splitStr(const str_ &str, const str_ &delim);
 
-	void	putError(str_ error_str);
-	void	exitWithPutError(str_ error_str);
-	void	exitWithError(const str_ &error_message);
-	str_ 	intToStr(int num);
-	void	x_close(int serv_socket, int line);
-	void	x_close(int serv_socket);
-	bool	contentEachExtension(const str_ &contents_path, const str_ &extention_look_for);
-	int		x_fcntl(int fd, int cmd, int flg);
-	str_	ft_strlwr(const str_ &str);
-	long	myStrToLL(str_ str);
-	str_	joinPath(const str_& path_front, const str_& path_back);
-	clock_t getMicroSec(clock_t time_limit);
+	void		putError(str_ error_str);
+	void		exitWithPutError(str_ error_str);
+	void		exitWithError(const str_ &error_message);
+	str_ 		intToStr(int num);
+	void		x_close(int serv_socket, int line);
+	void		x_close(int serv_socket);
+	bool		contentEachExtension(const str_ &contents_path, const str_ &extention_look_for);
+	int			x_fcntl(int fd, int cmd, int flg);
+	str_		ft_strlwr(const str_ &str);
+	long		myStrToLL(str_ str);
+	str_		joinPath(const str_& path_front, const str_& path_back);
+	clock_t 	getMicroSec(clock_t time_limit);
 }
 
 

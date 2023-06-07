@@ -47,7 +47,7 @@ class MessageManagement: public Request, public Response
 		enum e_attribution attribution;
 		Method	*method_p;
 		int		parent_fd;
-		Server	server;
+
 		std::deque<t_response_message>	deq_response_message;
 
 		MessageManagement();
@@ -55,12 +55,12 @@ class MessageManagement: public Request, public Response
 		MessageManagement &operator=(const MessageManagement &rhs);
 		~MessageManagement();
 
+		void	setDefaultServer(const vec_sever_ &servers);
 		int		makeResponseMessage(t_response_message	&response_message, int max_descripotor);
-		void	searchServer(int accepted_socket, const vec_sever_ &servers);
 		int 	storeMethodToDeq();
 		int		readCGIResponse(t_response_message &response_message);
 		int		writeCGIRequest(t_response_message &response_message);
-		bool	parseRequstMessage();
+		bool	parseRequstMessage(const vec_sever_ &servers);
 };
 
 std::ostream& operator<<(std::ostream &ostrm, const MessageManagement &tra);

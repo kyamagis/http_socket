@@ -36,35 +36,19 @@ MessageManagement &MessageManagement::operator=(const MessageManagement &rhs)
 	return *this;
 }
 
-/* 
-	ポート番号とホスト名が一致したサーバーを返す。
-	ポート番号が一致するが、ホスト名が一致しない場合、
-	ポート番号が一致するベクターの最後のサーバーを返す.
-*/
-
-void	MessageManagement::searchServer(int accepted_socket, const vec_sever_ &servers)
+void	MessageManagement::setDefaultServer(const vec_sever_ &servers)
 {
-	uint16_t	accepted_socket_port = mm_utils::getPortFromAcceptedSocket(accepted_socket);
-	size_t		maching_server_idx = 0;
-	bool		first_flg = false;
+	this->accepted_socket_port = mm_utils::getPortFromAcceptedSocket(this->accepted_socket);
 
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		if (accepted_socket_port == servers[i].listen_port.getValue())
+		if (this->accepted_socket_port == servers[i].listen_port.getValue())
 		{
-			if (first_flg == false)
-			{
-				maching_server_idx = i;
-				first_flg = true;
-			}
-			if (this->host.getValue()== servers[i].server_name.getValue())
-			{
-				this->server = servers[i];
-				return ;
-			}
+			this->server = servers[i];
+			return ;
 		}
 	}
-	this->server = servers[maching_server_idx];
+	this->server = servers[0];
 	return ;
 }
 
@@ -94,7 +78,6 @@ int MessageManagement::storeMethodToDeq()
 
 	return 405;
 }
-
 
 int	MessageManagement::makeResponseMessage(t_response_message &response_message, int max_descripotor)
 {
@@ -192,9 +175,9 @@ int		MessageManagement::writeCGIRequest(t_response_message &response_message)
 	return status;
 }
 
-bool	MessageManagement::parseRequstMessage()
+bool	MessageManagement::parseRequstMessage(const vec_sever_ &servers)
 {
-	return Request::parseRequstMessage(this->server);
+	return Request::parseRequstMessage(servers);
 }
 
 std::ostream &operator<<(std::ostream &ostrm, const MessageManagement &req)

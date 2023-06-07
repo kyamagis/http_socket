@@ -94,7 +94,38 @@ void	Request::_parseRequestLine(const str_ &request_line)
 	return ;
 }
 
-void	Request::_parseHost(const str_ &host_header)
+/* 
+	ポート番号とホスト名が一致したサーバーを返す。
+	ポート番号が一致するが、ホスト名が一致しない場合、
+	ポート番号が一致するベクターの最後のサーバーを返す.
+*/
+
+void	Request::_searchServer(const vec_sever_ &servers)
+{
+	size_t		maching_server_idx = 0;
+	bool		first_flg = false;
+
+	for (size_t i = 0; i < servers.size(); i++)
+	{
+		if (this->accepted_socket_port == servers[i].listen_port.getValue())
+		{
+			if (first_flg == false)
+			{
+				maching_server_idx = i;
+				first_flg = true;
+			}
+			if (this->host.getValue()== servers[i].server_name.getValue())
+			{
+				this->server = servers[i];
+				return ;
+			}
+		}
+	}
+	this->server = servers[maching_server_idx];
+	return ;
+}
+
+void	Request::_parseHost(const str_ &host_header, const vec_sever_ &servers)
 {
 	vec_str_	vec_host_header = utils::split_Str(host_header, " ");
 	if (vec_host_header.size() != 2) // Host: www.42.ac.jp:8080
@@ -126,6 +157,7 @@ void	Request::_parseHost(const str_ &host_header)
 	}
 	this->host.setValue(lower_str);
 	this->status_code = 200;
+	Request::_searchServer(servers);
 	return ;
 }
 
@@ -305,7 +337,7 @@ int	Request::_setLocation(const Server& server)
 	return 200;
 }
 
-bool	Request::_parseRequestLineAndHeaders(size_t entity_body_pos, const Server &server)
+bool	Request::_parseRequestLineAndHeaders(size_t entity_body_pos, const vec_sever_ &servers)
 {
 	vec_str_	vec_splite_request = Request::_spliteRequestLineAndHeader(entity_body_pos + 2);
 	if (vec_splite_request.size() < 2)
@@ -320,7 +352,7 @@ bool	Request::_parseRequestLineAndHeaders(size_t entity_body_pos, const Server &
 	if (this->status_code == 200)
 		Request::_parseRequestLine(vec_splite_request[0]);
 	if (this->status_code == 200)
-		Request::_parseHost(vec_splite_request[1]);
+		Request::_parseHost(vec_splite_request[1], servers);
 	Request::_parseHeaders(vec_splite_request);
 	Request::_setLocation(server);
 	if (this->content_length.getStatus() == NOT_SET && \
@@ -456,7 +488,7 @@ bool	Request::_parseRequestEntityBody()
 	return END;
 }
 
-bool	Request::parseRequstMessage(const Server &server)
+bool	Request::parseRequstMessage(const vec_sever_ &servers)
 {
 	size_t	entity_body_pos = this->request_message.find("\r\n\r\n");
 
@@ -470,7 +502,7 @@ bool	Request::parseRequstMessage(const Server &server)
 	}
 	else if  (entity_body_pos != str_::npos)//エンティティボディの検知
 	{
-		if (Request::_parseRequestLineAndHeaders(entity_body_pos, server) == END) // content-length, transfer-encoding が存在しない場合
+		if (Request::_parseRequestLineAndHeaders(entity_body_pos, servers) == END) // content-length, transfer-encoding が存在しない場合
 		{
 			return END;
 		}
