@@ -16,7 +16,7 @@
 int	main(int argc, char **argv)
 {
 	if (argc != 2)
-		utils::exitWithError("invalid number of arguments\nusage: ./webserv config/default.conf test/ok/get1");
+		utils::exitWithError("invalid number of arguments\nusage: ./webserv config/default.conf");
 
 	debug(argv[1]);
 	Config config(argv[1]);
