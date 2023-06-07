@@ -185,11 +185,12 @@ ssize_t	CGI::_readExecResulet()
 	ssize_t	read_len = read(readfd, buff, READ_LEN);
 	if (read_len == -1)
 	{
-		if (errno != EWOULDBLOCK)
+		/* if (errno != EWOULDBLOCK)
 		{
 			utils::putError("read() fail");
 			return -1;
-		}
+		} */
+		debug("read == -1");
 		return 0;
 	}
 	if (0 < read_len)

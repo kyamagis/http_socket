@@ -124,10 +124,10 @@ namespace IOM_utils
 		recved_len = recv(accepted, buffer, BUFF_SIZE, MSG_DONTWAIT);
 		if (recved_len == -1)
 		{
-			if (errno != EWOULDBLOCK)
+			/* if (errno != EWOULDBLOCK)
 			{
 				utils::exitWithPutError("recv() failed");
-			}
+			} */
 			debug("recv == -1");
 			return -1;
 		}
