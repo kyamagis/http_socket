@@ -7,29 +7,42 @@
 	<title>Document</title>
 </head>
 <body>
-	
+
 	<h1>webserv review </h1>
 	<h2>confファイル: conf/review.conf</h2>
-	<h2>GET</h2>
+	<input type="text" id="port" name="uriPort" value="">
 	<input type="text" id="deleteId" name="deletePath" value="">
-	<button onclick="deleteFile(document.getElementById('deleteId').value)">delete button</button>
-	<form method="post" action="/upload/">
-		<input type="text" name="hello">
-		<input type="submit" value="POST!!">
-	</form>
+	<button onclick="deleteFile()">delete button</button>
+	<br>
+	<input type="text" id="postId" name="post" value="">
+	<button onclick="postMethod()">post button</button>
 	<script>
-		// function deleteFile(path){
-		// 	console.log(path);
-		// }
-		function deleteFile(path){
+		
+	function deleteFile(){
 			console.log('deleteFile')
 			console.log(path)
-		fetch(`http://localhost:8085/delete/${path}`, {
+		fetch(`http://localhost:${port}/delete/${deletePath}`, {
 		  method: 'DELETE',
 		})
 		.then(response => response.json())
 		.then(data => console.log(data))
-		.catch((error) => console.log('Error:', error))};
+		.catch((error) => console.log('Error:', error))
+	};
+
+	function postMethod()
+	{
+		let usingPort = document.getElementById('port').value;
+			console.log(usingPort)
+		let postText = document.getElementById('postId').value
+		console.log(usingPort);
+		console.log(postText);
+
+		console.log('post');
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST',`http://localhost:${usingPort}/upload/`);
+		xhr.setRequestHeader('content-type', 'text/plain');
+		xhr.send(postText);
+	}
 
 	</script>
 </body>
