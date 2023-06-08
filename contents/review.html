@@ -21,8 +21,9 @@
 		
 	function deleteFile(){
 			console.log('deleteFile')
-			console.log(path)
-		fetch(`http://localhost:${port}/delete/${deletePath}`, {
+		let usingPort = document.getElementById('port').value;
+		let deletePath = document.getElementById('deleteId').value;
+		fetch(`http://localhost:${usingPort}/delete/${deletePath}`, {
 		  method: 'DELETE',
 		})
 		.then(response => response.json())
