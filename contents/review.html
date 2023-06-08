@@ -10,11 +10,12 @@
 
 	<h1>webserv review </h1>
 	<h2>confファイル: conf/review.conf</h2>
-	<input type="text" id="port" name="uriPort" value="">
-	<input type="text" id="deleteId" name="deletePath" value="">
+	<input type="text" id="port" name="uriPort" value="" placeholder="ポート番号">
+	<br>
+	<input type="text" id="deleteId" name="deletePath" value="" placeholder="deleteしたいファイル名">
 	<button onclick="deleteFile()">delete button</button>
 	<br>
-	<input type="text" id="postId" name="post" value="">
+	<input type="text" id="postId" name="post" value="" placeholder="postしたいコンテンツ">
 	<button onclick="postMethod()">post button</button>
 	<script>
 		
