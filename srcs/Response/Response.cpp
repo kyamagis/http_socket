@@ -73,6 +73,7 @@ str_	Response::redirectionResponseMessage(const Value<str_> &response_redirect_u
 	{
 		response_message += "Location: " + REDIRECTION_URI + "\r\n";
 	}
+	response_message += "Content-Length: 0\r\n";
 	return response_message + "\r\n";
 }
 
@@ -85,6 +86,7 @@ str_	Response::errorResponseMessage(const int status_code, const Server &server)
 	{
 		return response_message + Response::_searchErrorPage(status_code, server);
 	}
+	response_message += "Content-Length: 0\r\n";
 	return response_message + "\r\n";
 }
 
@@ -109,5 +111,6 @@ str_		Response::okResponseMessage(const int status_code,
 		response_message += "\r\n";
 		return response_message + str_response_entity_body;
 	}
+	response_message += "Content-Length: 0\r\n";
 	return response_message + "\r\n";
 }
