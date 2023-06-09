@@ -190,7 +190,12 @@ ssize_t	CGI::_readExecResulet()
 			utils::putError("read() fail");
 			return -1;
 		} */
+		debug("read_len == -1");
 		return -1;
+	}
+	if (read_len == 0)
+	{
+		debug("read_len == 0");
 	}
 	if (0 < read_len)
 	{
@@ -259,14 +264,9 @@ int CGI::readAndWaitpid()
 
 	if (read_len == -1)
 	{
-		debug("read_len == -1");
 		status_code = 500;
 	}
-	if (read_len == 0)
-	{
-		debug("read_len == 0");
-	}
-	else if (this->cgi_phase == CGI_read_header)
+	if (read_len != 0 && this->cgi_phase == CGI_read_header)
 	{
 		status_code = CGI::_parseCGIResponseHeaders();
 		if (status_code == 200)
@@ -274,7 +274,7 @@ int CGI::readAndWaitpid()
 			this->cgi_phase = CGI_read_body;
 		}
 	}
-	else if (this->cgi_phase == CGI_read_body)
+	if (read_len != 0 && this->cgi_phase == CGI_read_body)
 	{
 		status_code = CGI::_parseCGIResponseEntityBody();
 		if (status_code == END)
