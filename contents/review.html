@@ -7,18 +7,45 @@
 	<title>Document</title>
 </head>
 <body>
-	
+
 	<h1>webserv review </h1>
 	<h2>confファイル: conf/review.conf</h2>
-	<h2>GET</h2>
-	<form method="post" action="/">
-		<input type="text" name="textArea">
-		<input type="hidden" name="_method" value="DELETE"> <!-- この1行を追加！ -->
-		<input type="submit" value="delete!!">
-	</form>
-	<form method="post" action="/upload/">
-		<input type="text" name="hello">
-		<input type="submit" value="POST!!">
-	</form>
+	<input type="text" id="port" name="uriPort" value="" placeholder="ポート番号">
+	<br>
+	<input type="text" id="deleteId" name="deletePath" value="" placeholder="deleteしたいファイル名">
+	<button onclick="deleteFile()">delete button</button>
+	<br>
+	<input type="text" id="postId" name="post" value="" placeholder="postしたいコンテンツ">
+	<button onclick="postMethod()">post button</button>
+	<script>
+		
+	function deleteFile(){
+			console.log('deleteFile')
+		let usingPort = document.getElementById('port').value;
+		let deletePath = document.getElementById('deleteId').value;
+		fetch(`http://localhost:${usingPort}/delete/${deletePath}`, {
+		  method: 'DELETE',
+		})
+		.then(response => response.json())
+		.then(data => console.log(data))
+		.catch((error) => console.log('Error:', error))
+	};
+
+	function postMethod()
+	{
+		let usingPort = document.getElementById('port').value;
+			console.log(usingPort)
+		let postText = document.getElementById('postId').value
+		console.log(usingPort);
+		console.log(postText);
+
+		console.log('post');
+		let xhr = new XMLHttpRequest();
+		xhr.open('POST',`http://localhost:${usingPort}/upload/`);
+		xhr.setRequestHeader('content-type', 'text/plain');
+		xhr.send(postText);
+	}
+
+	</script>
 </body>
 </html>

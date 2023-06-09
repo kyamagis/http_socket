@@ -1,0 +1,30 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/akihito/42tokyo/42cursus/level5/webserv/yamagis_webserv'
+mkdir objs objs/Response objs/config objs/utils objs/CGI objs/MessageManagement objs/IOMultiplexing objs/Request objs/Method
+ 
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Response/response_utils.o -c srcs/Response/response_utils.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Response/Response.o -c srcs/Response/Response.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/config/Location.o -c srcs/config/Location.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/config/Config.o -c srcs/config/Config.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/config/Server.o -c srcs/config/Server.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/utils/utils.o -c srcs/utils/utils.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/CGI/CGI.o -c srcs/CGI/CGI.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/CGI/cgi_utils.o -c srcs/CGI/cgi_utils.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/MessageManagement/mm_utils.o -c srcs/MessageManagement/mm_utils.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/MessageManagement/MessageManagement.o -c srcs/MessageManagement/MessageManagement.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/IOMultiplexing/IOM_utils.o -c srcs/IOMultiplexing/IOM_utils.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/IOMultiplexing/IOMultiplexing.o -c srcs/IOMultiplexing/IOMultiplexing.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Request/request_utils.o -c srcs/Request/request_utils.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Request/Request.o -c srcs/Request/Request.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/main.o -c srcs/main.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Method/DELETE.o -c srcs/Method/DELETE.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Method/Method.o -c srcs/Method/Method.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Method/POST.o -c srcs/Method/POST.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Method/GET.o -c srcs/Method/GET.cpp
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Method/method_utils.o -c srcs/Method/method_utils.cpp
+ 
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes -o objs/Method/ErrorRequset.o -c srcs/Method/ErrorRequset.cpp
+ 
+c++ -Wall -Wextra -Werror -std=c++98 -MMD -MP -pedantic -fsanitize=address -I ./includes objs/Response/response_utils.o objs/Response/Response.o objs/config/Location.o objs/config/Config.o objs/config/Server.o objs/utils/utils.o objs/CGI/CGI.o objs/CGI/cgi_utils.o objs/MessageManagement/mm_utils.o objs/MessageManagement/MessageManagement.o objs/IOMultiplexing/IOM_utils.o objs/IOMultiplexing/IOMultiplexing.o objs/Request/request_utils.o objs/Request/Request.o objs/main.o objs/Method/DELETE.o objs/Method/Method.o objs/Method/POST.o objs/Method/GET.o objs/Method/method_utils.o objs/Method/ErrorRequset.o -o webserv
+make: Leaving directory `/Users/akihito/42tokyo/42cursus/level5/webserv/yamagis_webserv'
+ 
