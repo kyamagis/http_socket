@@ -254,7 +254,7 @@ int	CGI::_waitpid(int status_code)
 int CGI::readAndWaitpid()
 {
 	clock_t	start_time = utils::getMicroSec(0);
-	int		status_code = 0;
+	int		status_code = END;
 	ssize_t	read_len = CGI::_readExecResulet();
 
 	if (read_len == -1)
@@ -264,7 +264,7 @@ int CGI::readAndWaitpid()
 	}
 	if (read_len == 0)
 	{
-		status_code = END;
+		debug("read_len == 0");
 	}
 	else if (this->cgi_phase == CGI_read_header)
 	{
