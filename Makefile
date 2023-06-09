@@ -40,4 +40,4 @@ cgi: all
 	./webserv config/cgi.conf
 	
 
-.PHONY: all clean fclean re test cgi
+.PHONY: all clean fclean re review default cgi

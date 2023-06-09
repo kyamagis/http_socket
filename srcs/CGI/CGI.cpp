@@ -325,7 +325,7 @@ int CGI::_pipeAndFcntl()
 	return 0;
 }
 
-#define TIME_LIMIT 1000000 // 適当な数字
+#define TIME_LIMIT 1000 // 適当な数字
 
 int CGI::writeRequestEntityBodyToCGI()
 {
