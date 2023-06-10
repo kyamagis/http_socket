@@ -12,9 +12,9 @@ namespace utils
 {
 	vec_str_ split_Str(const str_ &str, const str_ &delim)
 	{
-		vec_str_	vec_split_str;
-		size_t		head_pos = 0;
-		size_t		found_pos = 0;
+		vec_str_ vec_split_str;
+		size_t head_pos = 0;
+		size_t found_pos = 0;
 
 		while (true)
 		{
@@ -52,12 +52,13 @@ namespace utils
 		return (vec_str);
 	}
 
-	void	putError(str_ error_str)
+	void putError(str_ error_str)
 	{
-		std::cerr << error_str << ": " << strerror(errno) << std::endl;
+		std::cerr << error_str << std::endl;
+		// std::cerr << error_str << ": " << strerror(errno) << std::endl;
 	}
 
-	void	exitWithPutError(str_ error_str)
+	void exitWithPutError(str_ error_str)
 	{
 		putError(error_str);
 		std::exit(EXIT_FAILURE);
@@ -81,19 +82,18 @@ namespace utils
 		return oss.str();
 	}
 
-	void	x_close(int serv_socket, int line)
+	void x_close(int serv_socket, int line)
 	{
 		int error_flg = close(serv_socket);
 		if (error_flg == -1)
 		{
-			std::cerr << "close() failed : " 
-						<< strerror(errno) 
-						<< " : line = " << line << std::endl;
+			std::cerr << "close() failed"
+					  << " : line = " << line << std::endl;
 			std::exit(EXIT_FAILURE);
 		}
 	}
 
-	void	x_close(int serv_socket)
+	void x_close(int serv_socket)
 	{
 		int error_flg = close(serv_socket);
 		if (error_flg == -1)
@@ -116,7 +116,7 @@ namespace utils
 		return true;
 	}
 
-	int	x_fcntl(int fd, int cmd, int flg)
+	int x_fcntl(int fd, int cmd, int flg)
 	{
 		if (fcntl(fd, cmd, flg) == -1)
 		{
