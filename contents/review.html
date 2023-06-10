@@ -11,9 +11,9 @@
 <body>
 	<h1>webserv review </h1>
 	<h2>confファイル: conf/review.conf</h2>
-	<input type="text" id="port" name="uriPort" placeholder="ポート番号">
+	<input type="text" id="port" name="uriPort" placeholder="ポート番号" required>
 	<br>
-	<input type="text" id="path" name="path" placeholder="リクエストしたいパス">
+	<input type="text" id="path" name="path" placeholder="リクエストしたいパス" required>
 	<br>
 	<input type="text" id="getPath" name="getPath" placeholder="getしたいファイル名">
 	<button onclick="sendRequest('GET')">get button</button>
@@ -23,41 +23,35 @@
 	<br>
 	<input type="text" id="postEntityBody" name="post" placeholder="postしたいエンティティボディ">
 	<button onclick="sendRequest('POST')">post button</button>
-	<br>
-	<input type="text" id="chunkedPostEntityBody" name="post" placeholder="chunekd: postしたいエンティティボディ">
-	<button onclick="sendRequest('POST', true)">post button</button>
 	<script>
-		function sendRequest(method, isChunked = false) {
+		function sendRequest(method) {
 			const port = document.getElementById('port').value;
 			const path = document.getElementById('path').value;
 			let url = `http://localhost:${port}${path}`;
 			if (method === 'GET') {
 				const getPath = document.getElementById('getPath').value;
 				url += getPath;
-
-
+				console.log(`url = ${url}`);
+				const xhr = new XMLHttpRequest();
+				xhr.open(method, url);
+				xhr.requestType = "txt/pain";
+				xhr.send();
 			}
 			else if (method === 'DELETE') {
 				const deletePath = document.getElementById('deletePath').value;
 				url += deletePath;
-
-				fetch(url, { method })
-					.then(response => response.json())
-					.then(data => console.log(data))
-					.catch(error => console.log('Error:', error));
-			}
-			else if (method === 'POST') {
-				const postText = isChunked ? document.getElementById('chunkedPostEntityBody').value : document.getElementById('postEntityBody').value;
-
+				console.log(`url = ${url}`)
 				const xhr = new XMLHttpRequest();
 				xhr.open(method, url);
+				xhr.send();
+			}
+			else if (method === 'POST') {
+				const postText = document.getElementById('postEntityBody').value;
+
+				const xhr = new XMLHttpRequest();
+				console.log(`url = ${url}`)
+				xhr.open(method, url);
 				xhr.setRequestHeader('Content-Type', 'text/plain');
-				// xhr.setRequestHeader('Connection', 'close');
-
-				if (isChunked) {
-					xhr.setRequestHeader('Transfer-Encoding', 'chunked');
-				}
-
 				xhr.send(postText);
 			}
 		}
