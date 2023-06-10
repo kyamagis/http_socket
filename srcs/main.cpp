@@ -2,17 +2,6 @@
 #include "../includes/IOMultiplexing.hpp"
 #include "../includes/Config.hpp"
 
-// vec_int_	makeVecPortsFormCharP(int argc, char **argv)
-// {
-// 	vec_int_	vec_ports;
-
-// 	for(int i = 0; i < argc; i++)
-// 	{
-// 		vec_ports.push_back(atoi(argv[i]));
-// 	}
-// 	return vec_ports;
-// }
-
 int	main(int argc, char **argv)
 {
 	if (argc != 2)
@@ -32,7 +21,3 @@ int	main(int argc, char **argv)
 
 	iom.IOMultiplexingLoop();
 }
-
-// https://github.com/kyamagis/http_socket.git
-
-// git config --local alias.rmp '!git checkout master && git pull https://github.com/kyamagis/http_socket.git master && git checkout - && git merge master'
