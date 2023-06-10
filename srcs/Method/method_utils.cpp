@@ -107,7 +107,7 @@ namespace method_utils
 			return 404;
 		}
 		if (access(file_name.c_str(), F_OK) == FOUND &&
-			access(file_name.c_str(), R_OK) == NOT_FOUND)
+			access(file_name.c_str(), W_OK) == NOT_FOUND)
 			return 403;
 		return writeFile(file_content, file_name);
 	}
