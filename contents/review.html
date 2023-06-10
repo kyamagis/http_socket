@@ -1,57 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
 </head>
-<body>
 
+<body>
 	<h1>webserv review </h1>
 	<h2>confファイル: conf/review.conf</h2>
-	<input type="text" id="port" name="uriPort" value="" placeholder="ポート番号">
+	<input type="text" id="port" name="uriPort" placeholder="ポート番号" required>
 	<br>
-	<input type="text" id="path" name="path" value="" placeholder="リクエストしたいパス">
+	<input type="text" id="path" name="path" placeholder="リクエストしたいパス" required>
 	<br>
-	<input type="text" id="deleteId" name="deletePath" value="" placeholder="deleteしたいファイル名">
-	
-	<button onclick="deleteFile()">delete button</button>
+	<input type="text" id="getPath" name="getPath" placeholder="getしたいファイル名">
+	<button onclick="sendRequest('GET')">get button</button>
 	<br>
-	<input type="text" id="postId" name="post" value="" placeholder="postしたいエンティティボディ">
-	<button onclick="postMethod()">post button</button>
+	<input type="text" id="deletePath" name="deletePath" placeholder="deleteしたいファイル名">
+	<button onclick="sendRequest('DELETE')">delete button</button>
+	<br>
+	<input type="text" id="postEntityBody" name="post" placeholder="postしたいエンティティボディ">
+	<button onclick="sendRequest('POST')">post button</button>
 	<script>
-		
-	function deleteFile(){
-			console.log('deleteFile')
-		let usingPort = document.getElementById('port').value;
-		let deletePath = document.getElementById('deleteId').value;
-		let requestPath = document.getElementById('path').value;
-		fetch(`http://localhost:${usingPort}${requestPath}${deletePath}`, {
-		  method: 'DELETE',
-		})
-		.then(response => response.json())
-		.then(data => console.log(data))
-		.catch((error) => console.log('Error:', error))
-	};
+		function sendRequest(method) {
+			const port = document.getElementById('port').value;
+			const path = document.getElementById('path').value;
+			let url = `http://localhost:${port}${path}`;
+			if (method === 'GET') {
+				const getPath = document.getElementById('getPath').value;
+				url += getPath;
+				console.log(`url = ${url}`);
+				const xhr = new XMLHttpRequest();
+				xhr.open(method, url);
+				xhr.requestType = "txt/pain";
+				xhr.send();
+			}
+			else if (method === 'DELETE') {
+				const deletePath = document.getElementById('deletePath').value;
+				url += deletePath;
+				console.log(`url = ${url}`)
+				const xhr = new XMLHttpRequest();
+				xhr.open(method, url);
+				xhr.send();
+			}
+			else if (method === 'POST') {
+				const postText = document.getElementById('postEntityBody').value;
 
-	function postMethod()
-	{
-		let usingPort = document.getElementById('port').value;
-		let postText = document.getElementById('postId').value;
-		let requestPath = document.getElementById('path').value;
-		console.log(usingPort);
-		console.log(postText);
-		console.log(requestPath);
-		console.log(`http://localhost:${usingPort}${requestPath}`)
-		let xhr = new XMLHttpRequest();
-		xhr.open('POST',`http://localhost:${usingPort}${requestPath}`);
-		xhr.setRequestHeader('content-type', 'text/plain');
-		xhr.send(postText);
-	}
-
-
-
+				const xhr = new XMLHttpRequest();
+				console.log(`url = ${url}`)
+				xhr.open(method, url);
+				xhr.setRequestHeader('Content-Type', 'text/plain');
+				xhr.send(postText);
+			}
+		}
 	</script>
 </body>
+
 </html>
