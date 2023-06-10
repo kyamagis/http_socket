@@ -18,7 +18,7 @@ int GET::_readFileContents(const str_ &contents_path)
 		return 404;
 	if (access(contents_path.c_str(), F_OK) == NOT_FOUND)
 		return 404;
-	if (access(contents_path.c_str(), R_OK) == NOT_FOUND) // chomod 000 でエラーを返さない，なんで？ '.'を外してやると777でもエラーになってしまう
+	if (access(contents_path.c_str(), R_OK) == NOT_FOUND)
 		return 403;
 	ifs.open(contents_path.c_str());
 	if (!ifs || !ifs.is_open())
